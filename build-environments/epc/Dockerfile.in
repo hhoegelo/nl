@@ -1,0 +1,3 @@
+FROM docker.io/archlinux:base-20220501.0.54834
+
+RUN touch /foo
