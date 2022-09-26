@@ -6,7 +6,7 @@ add_custom_command(
     COMMAND 
         mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/registry
     COMMAND 
-        podman ps | grep docker.io/library/registry:2 
+        podman ps | grep docker.io/library/registry:2 > /dev/null
         || podman run -d -p 5000:5000 -v ${CMAKE_CURRENT_BINARY_DIR}/registry:/var/lib/registry docker.io/registry:2
 )
 

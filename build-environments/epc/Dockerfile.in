@@ -6,4 +6,4 @@ RUN pacman --noconfirm -S archlinux-keyring
 RUN pacman-key --populate
 
 RUN pacman --noconfirm -Syyuu
-RUN pacman --noconfirm -S cmake gcc make
+RUN pacman --noconfirm -S cmake gcc make 
