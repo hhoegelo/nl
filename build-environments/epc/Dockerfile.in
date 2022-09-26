@@ -1,3 +1,9 @@
 FROM docker.io/archlinux:base-20220501.0.54834
 
-RUN touch /foo
+RUN pacman-key --init
+RUN pacman --noconfirm -Sy
+RUN pacman --noconfirm -S archlinux-keyring
+RUN pacman-key --populate
+
+RUN pacman --noconfirm -Syyuu
+RUN pacman --noconfirm -S cmake gcc make

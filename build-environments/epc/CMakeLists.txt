@@ -1,3 +1,3 @@
-project(build-environment-epc)
+SET(TARGET_MACHINE epc)
 
 registerPod(Dockerfile.in)

@@ -1,4 +1,4 @@
-project(c15-update)
+SET(PROJECT c15)
 
 add_subdirectory(beaglebone)
 add_subdirectory(epc)

@@ -1,0 +1,1 @@
+SET(TARGET_MACHINE playcontroller)
