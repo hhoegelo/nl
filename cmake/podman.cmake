@@ -1,12 +1,8 @@
-macro(registerPod DOCKERFILE)
+function(registerPod DOCKERFILE)
   configure_file(${DOCKERFILE} ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile @ONLY)
   file(SHA1 ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile DOCKERFILE_SHA1)
   
-  string(LENGTH ${CMAKE_BINARY_DIR} PREFIX_LENGTH)
-  MATH(EXPR PREFIX_LENGTH "${PREFIX_LENGTH}+1")
-  string(SUBSTRING ${CMAKE_CURRENT_BINARY_DIR} ${PREFIX_LENGTH} -1 DOCKERNAME)
-  string(REPLACE "/" "-" DOCKERNAME ${DOCKERNAME})
-  string(TOUPPER DOCKERNAME_UPPER ${DOCKERNAME})
+  set(DOCKERNAME ${PROJECT_NAME})
   
   add_custom_command(
     COMMENT "Provide Podman for ${DOCKERNAME}"
@@ -19,8 +15,36 @@ macro(registerPod DOCKERFILE)
         && podman push --tls-verify=false ${DOCKERNAME}:${DOCKERFILE_SHA1} ${PODMAN_REGISTRY}/${DOCKERNAME}:${DOCKERFILE_SHA1}
     )
   
-  message("Add target ${DOCKERNAME}")
+  message("Add pod ${DOCKERNAME}")
   add_custom_target(${DOCKERNAME} DEPENDS .podman)
-  
-  SET(RUN_ON_${DOCKERNAME_UPPER}_POD podman run --rm --userns=keep-id --tls-verify=false --rm ${PODMAN_REGISTRY}/${DOCKERNAME}:${DOCKERFILE_SHA1})  
-endmacro()
+endfunction()
+
+function(crossBuild TARGET PACKAGE)
+  STRING(TOUPPER PACKAGE ${PACKAGE})
+
+  file(SHA1 ${CMAKE_BINARY_DIR}/build-environments/${TARGET}/Dockerfile DOCKERFILE_SHA1)
+  set(DOCKERNAME build-environment-${TARGET})
+
+  SET(POD 
+    "podman run 
+    --tls-verify=false 
+    --rm 
+    -v ${CMAKE_SOURCE_DIR}:/src 
+    -v ${CMAKE_CURRENT_BINARY_DIR}:/build 
+    ${PODMAN_REGISTRY}/${DOCKERNAME}:${DOCKERFILE_SHA1}")
+
+    MESSAGE("POD: ${POD}")
+
+  SET(TARGETNAME ${PROJECT_NAME}-${PACKAGE})
+
+  add_custom_command(
+    COMMENT "X-Building ${PACKAGE} for ${TARGET}"
+    OUTPUT ${TARGETNAME}-update.tar
+    #COMMAND ${POD} "cmake -S /src -B /build -DBUILD_${PACKAGE}=On"
+    #COMMAND ${POD} "make -C /build"
+    COMMAND echo "foo"
+  )
+
+  add_custom_target(${TARGETNAME} DEPENDS ${TARGETNAME}-update.tar)
+  add_dependencies(${TARGETNAME} build-environment-${TARGET})
+endfunction()
