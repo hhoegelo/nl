@@ -1,0 +1,5 @@
+FROM @BUILDROOT_POD_URI@
+
+ENV PATH=/nonlinux/output/host/usr/bin:$PATH
+
+WORKDIR ~

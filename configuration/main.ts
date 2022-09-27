@@ -1,0 +1,1 @@
+console.log("const char* theProof=\"Typescript was here?!.\";")
