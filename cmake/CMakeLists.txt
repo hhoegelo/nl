@@ -1,0 +1,1 @@
+configure_file(package.cmake package.cmake COPYONLY)

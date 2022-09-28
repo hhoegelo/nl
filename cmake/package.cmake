@@ -1,0 +1,18 @@
+function(addConfiguration)
+    if(NOT CONFIGURATION_INJECTED)
+        add_dependencies(${PROJECT_NAME} configuration)
+    endif()
+
+    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/configuration)
+endfunction()
+
+function(deb DEPENDENCIES DESCRIPTION)
+    SET(CPACK_GENERATOR "DEB")
+    SET(CPACK_BINARY_DEB On)
+    SET(CPACK_PACKAGE_CONTACT "info@nonlinear-labs.de")
+    SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Nonlinear Labs GmbH")
+    SET(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+    SET(CPACK_DEBIAN_PACKAGE_DEPENDS ${DEPENDENCIES})
+    SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION ${DESCRIPTION})
+    INCLUDE(CPack)
+endfunction()

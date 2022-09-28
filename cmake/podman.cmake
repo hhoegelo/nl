@@ -37,6 +37,7 @@ function(crossBuild NAME)
       -v ${CMAKE_SOURCE_DIR}/build-environments/${TARGET_MACHINE}:/build-environment 
       -v ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}:/build
       -v ${CMAKE_BINARY_DIR}/configuration:/build/configuration
+      -v ${CMAKE_BINARY_DIR}/cmake:/build/cmake
       -w /build
       ${PODMAN_REGISTRY}/generic:${DOCKERFILE_SHA1})
 

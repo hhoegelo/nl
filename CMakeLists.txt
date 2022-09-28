@@ -7,6 +7,7 @@ include(cmake/podman.cmake)
 
 SET(PODMAN_REGISTRY quelltextlabor.de:5000)
 
+add_subdirectory(cmake)
 add_subdirectory(configuration)
 add_subdirectory(build-environments)
 add_subdirectory(packages)
