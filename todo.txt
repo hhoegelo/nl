@@ -1,5 +1,4 @@
 - authentication for docker registry (read everyone, write restricted)
 - playcontroller/supervisor environment
 - web (make each project a first class citizen)
-- build environment beaglebone
 - try use alpine docker with modern cmake and gcc in beaglebone build environment

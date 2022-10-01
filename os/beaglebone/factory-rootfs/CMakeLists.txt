@@ -1,4 +1,4 @@
-registerPod()
+registerPod("")
 
 add_custom_command(
     COMMENT "Build Beaglebone rootfs"

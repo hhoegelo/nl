@@ -1,7 +1,7 @@
 set(BUILD_TASK configuration)
 set(TARGET_MACHINE devpc)
 
-registerPod()
+registerPod("")
 
 add_custom_command(
     COMMENT "Build configuration"

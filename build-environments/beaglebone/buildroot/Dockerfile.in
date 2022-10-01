@@ -15,4 +15,4 @@ RUN sed -i 's/BR2_PACKAGE_C15/# BR2_PACKAGE_C15/g' configs/nonlinear_defconfig
 RUN sed -i 's/BR2_PACKAGE_ESPI_DRIVER/# BR2_PACKAGE_ESPI_DRIVER/g' configs/nonlinear_defconfig
 RUN sed -i 's/BR2_PACKAGE_PLAYCONTROLLER_DRIVER/# BR2_PACKAGE_PLAYCONTROLLER_DRIVER/g' configs/nonlinear_defconfig
 RUN make nonlinear_defconfig
-RUN make; cd output/build; find . -type f ! -name '.*' -delete; rm -rf dl
+RUN make; cd output/build; find . -type f ! -name '.*' -delete; rm -rf /nonlinux/dl

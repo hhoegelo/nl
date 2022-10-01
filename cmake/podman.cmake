@@ -1,4 +1,4 @@
-function(registerPod)
+function(registerPod DEPENDECIES)
   configure_file(Dockerfile.in ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile @ONLY)
   file(SHA1 ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile DOCKERFILE_SHA1)
 
@@ -14,6 +14,7 @@ function(registerPod)
       COMMENT "Provide Podman for ${BUILD_TASK}/${TARGET_MACHINE}/${DOCKERFILE_SHA1}"
       OUTPUT .podman
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile
+      DEPENDS ${DEPENDECIES}
       VERBATIM
       COMMAND ${CMAKE_CURRENT_BINARY_DIR}/runPodman.sh)
     

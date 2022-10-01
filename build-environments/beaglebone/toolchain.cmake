@@ -1,12 +1,12 @@
 set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_PROCESSOR armv7l)
+set(CMAKE_SYSTEM_PROCESSOR cortex-a8)
 
 set(CMAKE_SYSROOT /nonlinux/output/host/usr/arm-buildroot-linux-gnueabihf/sysroot)
 set(CMAKE_STAGING_PREFIX /nonlinux/output/staging)
 
-set(ENV{PKG_CONFIG_PATH} "${CMAKE_SYSROOT}/usr/lib/pkgconfig")
-set(ENV{PKG_CONFIG_LIBDIR} "/nonlinux/output/host/usr/lib/pkgconfig")
-set(ENV{PKG_CONFIG_SYSROOT_DIR} ${CMAKE_SYSROOT})
+set(ENV{PKG_CONFIG_PATH} "${CMAKE_STAGING_PREFIX}/usr/lib/pkgconfig")
+set(ENV{PKG_CONFIG_LIBDIR} "${CMAKE_STAGING_PREFIX}/usr/lib/pkgconfig")
+set(ENV{PKG_CONFIG_SYSROOT_DIR} ${CMAKE_STAGING_PREFIX})
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)

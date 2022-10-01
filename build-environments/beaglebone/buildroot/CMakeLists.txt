@@ -1,4 +1,4 @@
-registerPod()
+registerPod("")
 
 SET(RUN_POD podman run --tls-verify=false --rm -v ${CMAKE_CURRENT_BINARY_DIR}:/out  ${POD_URI})
 
