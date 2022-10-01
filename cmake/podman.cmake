@@ -36,6 +36,8 @@ function(crossBuild NAME)
     string(REGEX REPLACE \\] "" PACKAGE_DEPS "${PACKAGE_DEPS}")
     string(REGEX REPLACE \\[.*\\] "" PACKAGE ${PACKAGE})
 
+    SET(DEPENDENCIES ${DEPENDENCIES} ${PACKAGE})
+
     string(TOUPPER ${PACKAGE} PACKAGE_CANONIC)
     
     string(REPLACE "-" "_" PACKAGE_CANONIC ${PACKAGE_CANONIC})
@@ -47,6 +49,7 @@ function(crossBuild NAME)
       -v ${CMAKE_BINARY_DIR}/configuration:/build/configuration
       -v ${CMAKE_BINARY_DIR}/shared:/build/shared
       -v ${CMAKE_BINARY_DIR}/cmake:/build/cmake
+      -v ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot:/staging
       -w /build
       ${PODMAN_REGISTRY}/generic:${DOCKERFILE_SHA1})
 
@@ -57,6 +60,25 @@ function(crossBuild NAME)
       SET(TOOLCHAIN -DCMAKE_TOOLCHAIN_FILE=/build-environment/toolchain.cmake)
     endif()
 
+    if(PACKAGE_DEPS)
+      add_custom_command(
+        COMMENT "Prepare sysroot for x-build for ${PACKAGE} for ${TARGET_MACHINE}"
+        OUTPUT .${PACKAGE}-sysroot
+        DEPENDS ${PACKAGE_DEPS}
+        DEPENDS ${PACKAGE_DEPS}.deb
+        COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot
+        COMMAND dpkg-deb -x ${PACKAGE_DEPS}.deb ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot 
+        COMMAND touch .${PACKAGE}-sysroot
+      )
+    else()
+      add_custom_command(
+        COMMENT "No sysroot to prepare for x-build for ${PACKAGE} for ${TARGET_MACHINE}"
+        OUTPUT .${PACKAGE}-sysroot
+        COMMAND COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot
+        COMMAND touch .${PACKAGE}-sysroot
+      )
+    endif()
+
     add_custom_command(
       COMMENT "X-Building ${PACKAGE} for ${TARGET_MACHINE}"
       OUTPUT ${PACKAGE}.deb
@@ -64,17 +86,15 @@ function(crossBuild NAME)
       DEPENDS pod-${DOCKERFILE_SHA1}
       DEPENDS ${ALL_PROJECT_FILES}
       DEPENDS ${ALL_CONFIGURATION_FILES}
-      DEPENDS ${PACKAGE_DEPS}
+      DEPENDS .${PACKAGE}-sysroot
       VERBATIM
       COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}
       COMMAND ${RUN_POD} cmake -DCROSS_BUILD=On ${TOOLCHAIN} /src
-      # COMMAND ${RUN_POD} bash
       COMMAND ${RUN_POD} make -C /build install
       COMMAND ${RUN_POD} cpack -D CPACK_PACKAGE_FILE_NAME=${PACKAGE}
       COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}/${PACKAGE}.deb ${CMAKE_CURRENT_BINARY_DIR})
   endforeach()
 
-  SET(DEPENDENCIES ${ARGN})
   list(TRANSFORM DEPENDENCIES APPEND .deb)
   SET(DEPENDENCIES_FILES ${DEPENDENCIES})
   list(TRANSFORM DEPENDENCIES PREPEND ${CMAKE_CURRENT_BINARY_DIR}/)
