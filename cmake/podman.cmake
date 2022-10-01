@@ -30,7 +30,14 @@ function(crossBuild NAME)
 
   # commands for cross building all the desired packages
   foreach(PACKAGE ${ARGN})
+
+    string(REGEX MATCH \\[.*\\] PACKAGE_DEPS ${PACKAGE})
+    string(REGEX REPLACE \\[ "" PACKAGE_DEPS "${PACKAGE_DEPS}")
+    string(REGEX REPLACE \\] "" PACKAGE_DEPS "${PACKAGE_DEPS}")
+    string(REGEX REPLACE \\[.*\\] "" PACKAGE ${PACKAGE})
+
     string(TOUPPER ${PACKAGE} PACKAGE_CANONIC)
+    
     string(REPLACE "-" "_" PACKAGE_CANONIC ${PACKAGE_CANONIC})
     set(RUN_POD podman run 
       --tls-verify=false --rm -ti
@@ -38,6 +45,7 @@ function(crossBuild NAME)
       -v ${CMAKE_SOURCE_DIR}/build-environments/${TARGET_MACHINE}:/build-environment 
       -v ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}:/build
       -v ${CMAKE_BINARY_DIR}/configuration:/build/configuration
+      -v ${CMAKE_BINARY_DIR}/shared:/build/shared
       -v ${CMAKE_BINARY_DIR}/cmake:/build/cmake
       -w /build
       ${PODMAN_REGISTRY}/generic:${DOCKERFILE_SHA1})
@@ -56,9 +64,11 @@ function(crossBuild NAME)
       DEPENDS pod-${DOCKERFILE_SHA1}
       DEPENDS ${ALL_PROJECT_FILES}
       DEPENDS ${ALL_CONFIGURATION_FILES}
+      DEPENDS ${PACKAGE_DEPS}
       VERBATIM
       COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}
-      COMMAND ${RUN_POD} cmake -DCONFIGURATION_INJECTED=On ${TOOLCHAIN} /src
+      COMMAND ${RUN_POD} cmake -DCROSS_BUILD=On ${TOOLCHAIN} /src
+      # COMMAND ${RUN_POD} bash
       COMMAND ${RUN_POD} make -C /build install
       COMMAND ${RUN_POD} cpack -D CPACK_PACKAGE_FILE_NAME=${PACKAGE}
       COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}/${PACKAGE}.deb ${CMAKE_CURRENT_BINARY_DIR})

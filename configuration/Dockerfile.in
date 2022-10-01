@@ -2,3 +2,11 @@ FROM docker.io/alpine:3.16.2
 
 RUN apk add --no-cache nodejs npm
 RUN npm install -g ts-node
+RUN apk add --no-cache bash
+RUN npm install -g typescript
+RUN apk add g++
+
+WORKDIR /root
+COPY ./package.json .
+
+RUN npm install 

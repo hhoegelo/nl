@@ -1,0 +1,6 @@
+file(GLOB_RECURSE SHARED_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} *)
+
+FOREACH(FILE ${SHARED_FILES})
+    configure_file(${FILE} ${FILE} COPYONLY)
+    message("configure ${FILE}")
+ENDFOREACH()

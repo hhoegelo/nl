@@ -1,4 +1,6 @@
 - authentication for docker registry (read everyone, write restricted)
-- playcontroller/supervisor environment
 - web (make each project a first class citizen)
-- try use alpine docker with modern cmake and gcc in beaglebone build environment
+
+- nltools test x-build missing catch.h
+- x-build of stuff with local dependecy to nltool => idea project[dependency]
+

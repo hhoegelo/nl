@@ -1,5 +1,5 @@
 function(addConfiguration)
-    if(NOT CONFIGURATION_INJECTED)
+    if(NOT CROSS_BUILD)
         add_dependencies(${PROJECT_NAME} configuration)
     endif()
 

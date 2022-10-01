@@ -1,0 +1,6 @@
+if(CROSS_BUILD)
+else()
+    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/packages/nltools/include)
+    target_link_libraries(${PROJECT_NAME} PRIVATE nltools)
+    add_dependencies(${PROJECT_NAME} nltools)
+endif()
