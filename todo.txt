@@ -2,5 +2,7 @@
 - web (make each project a first class citizen)
 
 - nltools test x-build missing catch.h
-- x-build of stuff with local dependecy to nltool => idea project[dependency]
+- epc => iso burn with packages, add script to install target system
+
+
 

@@ -1,0 +1,39 @@
+FROM docker.io/archlinux:base-20220925.0.89186
+
+RUN pacman-key --init
+RUN pacman --noconfirm -Sy
+RUN pacman --noconfirm -S archlinux-keyring
+RUN pacman-key --populate
+
+# create a system capabale of building uefi-isos
+ENV DOCKER_PACKAGES="arch-install-scripts pacman-contrib dosfstools archiso erofs-utils"
+RUN sed -i 's/^SigLevel.*/SigLevel = Optional TrustAll/g' /etc/pacman.conf
+RUN echo "RemoteFileSigLevel = Optional TrustAll" >> /etc/pacman.conf
+RUN echo "Server = https://archive.archlinux.org/repos/2022/10/01/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist
+RUN pacman --noconfirm -Sy
+RUN pacman --noconfirm -Su $DOCKER_PACKAGES 
+
+# download packages forming the factory os
+ENV FACTORY_ROOTFS_PACKAGES="sudo binutils linux-rt mc nano mkinitcpio mkinitcpio-nfs-utils rsync grub efibootmgr linux-firmware vi"
+RUN echo "[realtime]" >> /etc/pacman.conf
+RUN echo "Server = https://pkgbuild.com/~dvzrv/repos/realtime/x86_64/" >> /etc/pacman.conf
+RUN pacman --noconfirm -Sy
+RUN echo "$FACTORY_ROOTFS_PACKAGES" | sed -e 's/ /\n/g' | xargs -i pactree -s -u {} | sort -u > /packages
+RUN pacman --noconfirm -Sw $(cat /packages)
+
+# prepare iso generation
+ENV ISO_PACKAGES="arch-install-scripts base dosfstools efibootmgr erofs-utils linux mkinitcpio mkinitcpio-archiso nano syslinux"
+RUN pacman --noconfirm -Sy
+RUN cp -r /usr/share/archiso/configs/baseline/ /archlive
+ADD sda.sfdisk /archlive/airootfs/sda.sfdisk
+ADD install-factory-os.sh /archlive/airootfs/install-factory-os.sh
+RUN ln -s install-factory-os.sh /archlive/airootfs/runme.sh
+RUN echo "$ISO_PACKAGES" | sed -e 's/ /\n/g' > /archlive/packages.x86_64
+RUN mkdir -p /archlive/airootfs/packages
+RUN mv /var/cache/pacman/pkg/* /archlive/airootfs/packages
+
+RUN echo "Server = https://archive.archlinux.org/repos/2022/10/01/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist
+RUN pacman --noconfirm -Sy
+RUN pacman --noconfirm -Su
+
+CMD mkarchiso -v -w /work_dir -o /out /archlive

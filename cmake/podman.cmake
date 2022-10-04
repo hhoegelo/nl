@@ -12,14 +12,16 @@ function(registerPod DEPENDECIES)
     
     add_custom_command(
       COMMENT "Provide Podman for ${BUILD_TASK}/${TARGET_MACHINE}/${DOCKERFILE_SHA1}"
-      OUTPUT .podman
+      OUTPUT .podman-${DOCKERFILE_SHA1}
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile
       DEPENDS ${DEPENDECIES}
       VERBATIM
-      COMMAND ${CMAKE_CURRENT_BINARY_DIR}/runPodman.sh)
+      COMMAND ${CMAKE_CURRENT_BINARY_DIR}/runPodman.sh
+      COMMAND touch .podman-${DOCKERFILE_SHA1}
+      )
     
     message("Add pod ${POD_TARGET} for ${CMAKE_CURRENT_SOURCE_DIR}")
-    add_custom_target(${POD_TARGET} DEPENDS .podman)
+    add_custom_target(${POD_TARGET} DEPENDS .podman-${DOCKERFILE_SHA1})
   endif()
 endfunction()
 
@@ -90,7 +92,7 @@ function(crossBuild NAME)
       VERBATIM
       COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}
       COMMAND ${RUN_POD} cmake -DCROSS_BUILD=On ${TOOLCHAIN} /src
-      COMMAND ${RUN_POD} make -C /build install
+      COMMAND ${RUN_POD} make -C /build install -j $(nproc)
       COMMAND ${RUN_POD} cpack -D CPACK_PACKAGE_FILE_NAME=${PACKAGE}
       COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}/${PACKAGE}.deb ${CMAKE_CURRENT_BINARY_DIR})
   endforeach()
