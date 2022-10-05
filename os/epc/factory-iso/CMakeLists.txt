@@ -11,7 +11,7 @@ add_custom_command(
     OUTPUT epc-factory.iso
     DEPENDS ${POD_TARGET}
     VERBATIM
-    COMMAND sudo ${RUN_POD}
+    COMMAND ${RUN_POD}
 )
 
 add_custom_target(epc-factory-iso DEPENDS epc-factory.iso)
