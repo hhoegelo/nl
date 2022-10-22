@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5.1)
 project(nltools)
 
 find_package(PkgConfig REQUIRED)
+include(GNUInstallDirs)
 
 # add_subdirectory(tests)
 
@@ -21,9 +22,10 @@ link_directories(${LIB_LIBRARY_DIRS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION lib)
-install(FILES ${HEADER_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
+INSTALL(TARGETS ${PROJECT_NAME})
+INSTALL(DIRECTORY ./include/ TYPE INCLUDE)
 
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
 include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)
+
 deb("" "Tools library for Nonlinear Labs software")

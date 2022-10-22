@@ -68,9 +68,9 @@ function(crossBuild NAME)
         OUTPUT .${PACKAGE}-sysroot
         DEPENDS ${PACKAGE_DEPS}
         DEPENDS ${PACKAGE_DEPS}.deb
+        COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot
         COMMAND dpkg-deb -x ${PACKAGE_DEPS}.deb ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot 
-        COMMAND touch .${PACKAGE}-sysroot
       )
     else()
       add_custom_command(
@@ -91,8 +91,9 @@ function(crossBuild NAME)
       DEPENDS .${PACKAGE}-sysroot
       VERBATIM
       COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}
-      COMMAND ${RUN_POD} cmake -DCROSS_BUILD=On ${TOOLCHAIN} /src
-      COMMAND ${RUN_POD} make -C /build install -j $(nproc)
+      # COMMAND ${RUN_POD} bash
+      COMMAND ${RUN_POD} cmake -G Ninja -DCROSS_BUILD=On ${TOOLCHAIN} /src
+      COMMAND ${RUN_POD} ninja -C /build install
       COMMAND ${RUN_POD} cpack -D CPACK_PACKAGE_FILE_NAME=${PACKAGE}
       COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}/${PACKAGE}.deb ${CMAKE_CURRENT_BINARY_DIR})
   endforeach()

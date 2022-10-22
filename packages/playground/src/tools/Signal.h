@@ -64,7 +64,7 @@ template <typename tFirst, typename... tArgs> class Signal : public sigc::signal
 
   void deferedSend(const tArgs &... args)
   {
-    m_deferedSend = [=]() { send(args...); };
+    m_deferedSend = [=, this]() { send(args...); };
     SignalBase::deferedSend();
   }
 

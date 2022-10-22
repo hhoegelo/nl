@@ -1,7 +1,7 @@
 #pragma once
 
 #include "UpdateDocumentContributor.h"
-#include <nltools/include/nltools/messaging/API.h>
+#include <nltools/messaging/API.h>
 
 class SyncMaster;
 

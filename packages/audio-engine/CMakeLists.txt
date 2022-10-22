@@ -7,7 +7,7 @@ SET(RECORDER_HTTPSERVER_PORT 8890)
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
 
-pkg_check_modules(LIBS REQUIRED glibmm-2.4 alsa flac)
+pkg_check_modules(LIBS REQUIRED glibmm-2.4 giomm-2.4 alsa flac libsoup-2.4)
 
 file(GLOB_RECURSE SOURCE_FILES ./src/*.cpp)
 

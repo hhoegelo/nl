@@ -106,7 +106,8 @@ Application::Application(int numArgs, char **argv)
     , m_clipboard(new Clipboard(m_http->getUpdateDocumentMaster()))
     , m_usbChangeListener(std::make_unique<USBChangeListener>())
     , m_webUISupport(std::make_unique<WebUISupport>(m_http->getUpdateDocumentMaster()))
-    , m_actionManagers(m_http->getUpdateDocumentMaster(), *m_presetManager, *m_audioEngineProxy, *m_hwui, *m_settings, *m_voiceGroupManager)
+    , m_actionManagers(m_http->getUpdateDocumentMaster(), *m_presetManager, *m_audioEngineProxy, *m_hwui, *m_settings,
+                       *m_voiceGroupManager)
     , m_heartbeatState(false)
     , m_isQuit(false)
 {
@@ -225,24 +226,21 @@ void Application::runWatchDog()
 
   if(m_aggroWatchDog)
   {
-    m_aggroWatchDog->run(std::chrono::milliseconds(250),
-                         [=](int numWarning, int inactiveFoMS)
-                         {
-                           DebugLevel::warning("Aggro WatchDog was inactive for ", inactiveFoMS, "ms. Warning #",
-                                               numWarning);
+    m_aggroWatchDog->run(std::chrono::milliseconds(250), [this](int numWarning, int inactiveFoMS) {
+      DebugLevel::warning("Aggro WatchDog was inactive for ", inactiveFoMS, "ms. Warning #", numWarning);
 
 #ifdef _PROFILING
-                           Profiler::get().printAllCallstacks();
+      Profiler::get().printAllCallstacks();
 #endif
 
-                           if(auto h = getHWUI())
-                           {
-                             if(getSettings()->getSetting<BlockingMainThreadIndication>()->get())
-                             {
-                               h->indicateBlockingMainThread();
-                             }
-                           }
-                         });
+      if(auto h = getHWUI())
+      {
+        if(getSettings()->getSetting<BlockingMainThreadIndication>()->get())
+        {
+          h->indicateBlockingMainThread();
+        }
+      }
+    });
   }
 }
 

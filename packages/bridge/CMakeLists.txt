@@ -62,7 +62,7 @@ endforeach(SERVICE)
 
 install(DIRECTORY DESTINATION ${SYSTEMD_SERVICES_INSTALL_DIR}/multi-user.target.wants)
 install(DIRECTORY DESTINATION ${SYSTEMD_SERVICES_INSTALL_DIR}/sysinit.target.wants)
-install(TARGETS ${PROJECT_NAME} DESTINATION ${C15_INSTALL_PATH}/${PROJECT_NAME})
+install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
 include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)

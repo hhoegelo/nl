@@ -16,27 +16,27 @@ Clipboard::Clipboard(UpdateDocumentContributor *parent)
     : ContentSection(parent)
     , m_actions("/clipboard/")
 {
-  m_actions.addAction("copy-bank", [=](std::shared_ptr<NetworkRequest> request) {
+  m_actions.addAction("copy-bank", [this](std::shared_ptr<NetworkRequest> request) {
     copyBank(Uuid { request->get("bank") });
     request->okAndComplete();
   });
 
-  m_actions.addAction("cut-preset", [=](std::shared_ptr<NetworkRequest> request) {
+  m_actions.addAction("cut-preset", [this](std::shared_ptr<NetworkRequest> request) {
     cutPreset(Uuid { request->get("preset") });
     request->okAndComplete();
   });
 
-  m_actions.addAction("copy-preset", [=](std::shared_ptr<NetworkRequest> request) {
+  m_actions.addAction("copy-preset", [this](std::shared_ptr<NetworkRequest> request) {
     copyPreset(Uuid { request->get("preset") });
     request->okAndComplete();
   });
 
-  m_actions.addAction("copy-presets", [=](std::shared_ptr<NetworkRequest> request) {
+  m_actions.addAction("copy-presets", [this](std::shared_ptr<NetworkRequest> request) {
     copyPresets(request->get("presets-csv"));
     request->okAndComplete();
   });
 
-  m_actions.addAction("paste-on-background", [=](std::shared_ptr<NetworkRequest> request) {
+  m_actions.addAction("paste-on-background", [this](std::shared_ptr<NetworkRequest> request) {
     auto x = request->get("x");
     auto y = request->get("y");
 
@@ -50,7 +50,7 @@ Clipboard::Clipboard(UpdateDocumentContributor *parent)
     request->okAndComplete();
   });
 
-  m_actions.addAction("paste-on-bank", [=](std::shared_ptr<NetworkRequest> request) {
+  m_actions.addAction("paste-on-bank", [this](std::shared_ptr<NetworkRequest> request) {
     if(containsBank())
       pasteBankOnBank("Paste Bank", Uuid { request->get("bank") });
     else if(containsPreset())
@@ -61,7 +61,7 @@ Clipboard::Clipboard(UpdateDocumentContributor *parent)
     request->okAndComplete();
   });
 
-  m_actions.addAction("paste-on-preset", [=](std::shared_ptr<NetworkRequest> request) {
+  m_actions.addAction("paste-on-preset", [this](std::shared_ptr<NetworkRequest> request) {
     if(containsBank())
       pasteBankOnPreset("Paste Bank", Uuid { request->get("preset") });
     else if(containsPreset())

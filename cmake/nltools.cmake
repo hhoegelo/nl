@@ -1,5 +1,6 @@
 if(CROSS_BUILD)
-    target_include_directories(${PROJECT_NAME} PRIVATE /staging/usr/include)
+    cmake_minimum_required(VERSION 3.02)
+    target_include_directories(${PROJECT_NAME} PRIVATE /staging/usr/include/)
     target_link_libraries(${PROJECT_NAME} PRIVATE /staging/usr/lib/libnltools.so)
 else()
     target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/packages>)

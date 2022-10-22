@@ -76,7 +76,7 @@ void ModulateableParameter::setModulationAmount(UNDO::Transaction *transaction, 
   {
     auto swapData = UNDO::createSwapData(clampedAmount);
 
-    transaction->addSimpleCommand([=](UNDO::Command::State) mutable {
+    transaction->addSimpleCommand([this, swapData](UNDO::Command::State) mutable {
       swapData->swapWith(m_modulationAmount);
       getValue().resetSaturation();
       DebugLevel::gassy("mod amount set to", m_modulationAmount);
@@ -120,7 +120,7 @@ void ModulateableParameter::setModulationSource(UNDO::Transaction *transaction, 
   {
     auto swapData = UNDO::createSwapData(src);
 
-    transaction->addSimpleCommand([=](UNDO::Command::State) mutable {
+    transaction->addSimpleCommand([this, swapData](UNDO::Command::State) mutable {
       if(auto groups = dynamic_cast<ParameterGroupSet *>(getParentGroup()->getParent()))
       {
         if(m_modSource != MacroControls::NONE)
