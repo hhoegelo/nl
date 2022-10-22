@@ -3,5 +3,12 @@ add_subdirectory(midi-over-ip/)
 add_subdirectory(nltools/)
 add_subdirectory(playground/)
 add_subdirectory(audio-engine/)
-add_subdirectory(playcontroller-firmware/)
+
+if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
+    message("Building playcontroller")
+    add_subdirectory(playcontroller-firmware/)
+else()
+    message("Not building playcontroller")
+endif()
+
 add_subdirectory(playcontroller-tools/)

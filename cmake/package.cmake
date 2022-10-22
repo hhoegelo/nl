@@ -1,10 +1,4 @@
-function(addConfiguration)
-    if(NOT CROSS_BUILD)
-        add_dependencies(${PROJECT_NAME} configuration)
-    endif()
 
-    target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/configuration)
-endfunction()
 
 function(deb DEPENDENCIES DESCRIPTION)
     SET(CPACK_GENERATOR "DEB")

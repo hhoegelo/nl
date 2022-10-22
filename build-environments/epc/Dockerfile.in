@@ -7,3 +7,6 @@ RUN pacman-key --populate
 
 RUN pacman --noconfirm -Syyuu
 RUN pacman --noconfirm -S cmake gcc make 
+RUN pacman --noconfirm -S pkg-config
+RUN pacman --noconfirm -S glibmm libsoup
+RUN pacman --noconfirm -S boost

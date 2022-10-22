@@ -1,0 +1,104 @@
+{
+  "layouts": {
+    "Layer-Sound-Select-Layout": {
+      "Selector": {
+        "UIFocus": "Sound",
+        "UIMode": "Select",
+        "UIDetail": "Init"
+      },
+      "Conditions": [
+        "isLayerSound"
+      ],
+      "Controls": {
+        "Header": {
+          "Class": "InvertedLabel",
+          "Position": "0, 0",
+          "Events": "EditBufferTypeText => Text[Text]"
+        },
+        "Name": {
+          "Class": "WideHighlightLabel",
+          "Position": "64, 0",
+          "Events": "CurrentVoiceGroupLabel => Text[Text]"
+        },
+        "ButtonA": {
+          "Class": "Button",
+          "Position": "BUTTON_A",
+          "Events": "SelectVGButtonText => Text[Text]"
+        },
+        "ButtonB": {
+          "Class": "Button",
+          "Position": "BUTTON_B",
+          "Events": "SoundParamsButtonText => Text[Text]"
+        },
+        "ButtonC": {
+          "Class": "Button",
+          "Position": "BUTTON_C",
+          "Init": {
+            "Text[Text]": "Voices.."
+          },
+          "Events": "SoundVoicesButtonText => Text[Text]"
+        },
+        "ButtonD": {
+          "Class": "Button",
+          "Position": "BUTTON_D",
+          "Init": {
+            "Text[Text]": "Master.."
+          },
+          "Events": "SoundMasterButtonText => Text[Text]"
+        },
+        "Upper": {
+          "Class": "LayerVoiceGroupI",
+          "Position": "57, 16",
+          "Init": {
+            "VoiceGroupIdentifier[Text]": "I"
+          },
+          "Events": "isCurrentVGI => ANY[Highlight], VGIMasterTuneText => Unison[Text], VGIMasterVolumeText => Master[Text], VGIMuted => MuteIndication[Text]"
+        },
+        "UpperFade": {
+          "Class": "FadeIndicatorI",
+          "Position": "128, 20"
+        },
+        "Lower": {
+          "Class": "LayerVoiceGroupII",
+          "Position": "57, 32",
+          "Init": {
+            "VoiceGroupIdentifier[Text]": "II",
+            "Unison[Text]": "",
+            "Master[Text]": ""
+          },
+          "Events": "isCurrentVGII => ANY[Highlight], VGIIMasterTuneText => Unison[Text], VGIIMasterVolumeText => Master[Text], VGIIMuted => MuteIndication[Text]"
+        },
+        "LowerFade": {
+          "Class": "FadeIndicatorII",
+          "Position": "128, 36"
+        },
+        "FBBoth": {
+          "Class": "LayerFBImageLarge",
+          "Position": "29, 19",
+          "Init": {
+            "Image[ImagePath]": ""
+          },
+          "Events": "LayerFBState => Image[ImagePath]"
+        },
+        "FX": {
+          "Class": "LayerFBImageLarge",
+          "Position": "201, 21",
+          "Init": {
+            "Image[ImagePath]": ""
+          },
+          "Events": "LayerFXState => Image[ImagePath], LayerFXOffset => Image[ImageOffset]"
+        }
+      },
+      "EventSinks": {
+        "BUTTON_A": "ToggleVoiceGroup",
+        "BUTTON_B": "OpenPartScreen",
+        "BUTTON_C": "SwitchToVoicesDetail",
+        "BUTTON_D": "OpenMasterParameter",
+        "BUTTON_INC": "LayerMuteInc",
+        "BUTTON_DEC": "LayerMuteDec",
+        "ROTARY_PLUS": "LayerMuteInc",
+        "ROTARY_MINUS": "LayerMuteDec"
+      }
+    }
+  }
+}

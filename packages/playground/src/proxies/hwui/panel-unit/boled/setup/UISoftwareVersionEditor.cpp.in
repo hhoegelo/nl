@@ -1,0 +1,66 @@
+#include <Application.h>
+#include <proxies/hwui/panel-unit/boled/preset-screens/controls/InvertedLabel.h>
+#include <proxies/hwui/controls/ControlWithChildren.h>
+#include <proxies/hwui/panel-unit/boled/setup/UISoftwareVersionEditor.h>
+#include <device-info/RTSoftwareVersion.h>
+
+UISoftwareVersionEditor::UISoftwareVersionEditor()
+{
+  addEntry("branch", "Branch:", getBranch());
+  addEntry("commits", "Commits:", getCommitCount());
+  addEntry("head", "HEAD:", getHead());
+  addEntry("date", "Date:", getCommitDate());
+
+  auto rtSoftwareValue = Application::get().getDeviceInformation()->getItem<RTSoftwareVersion>()->get();
+  addEntry("rt", "RT Version:", rtSoftwareValue);
+  m_ogOrder = m_order;
+  sortOrder();
+  doLayout();
+}
+
+void UISoftwareVersionEditor::setPosition(const Rect &)
+{
+  doLayout();
+}
+
+const char* UISoftwareVersionEditor::getBranch()
+{
+  return "@BRANCH_NAME@";
+}
+
+const char* UISoftwareVersionEditor::getHead()
+{
+  return "@HEAD_REF@";
+}
+
+const char* UISoftwareVersionEditor::getCommitCount()
+{
+  return "@COMMIT_COUNT@";
+}
+
+const char* UISoftwareVersionEditor::getCommitDate()
+{
+  return "@COMMIT_DATE@";
+}
+
+bool UISoftwareVersionEditor::onRotary(int inc, ButtonModifiers modifiers)
+{
+  m_showLast = inc > 0;
+  sortOrder();
+  doLayout();
+  return true;
+}
+
+void UISoftwareVersionEditor::sortOrder()
+{
+  if(m_showLast)
+  {
+    auto cp = m_ogOrder;
+    std::rotate(cp.begin(), cp.begin() + 1, cp.end());
+    m_order = cp;
+  }
+  else
+  {
+    m_order = m_ogOrder;
+  }
+}

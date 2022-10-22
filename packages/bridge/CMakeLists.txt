@@ -65,5 +65,5 @@ install(DIRECTORY DESTINATION ${SYSTEMD_SERVICES_INSTALL_DIR}/sysinit.target.wan
 install(TARGETS ${PROJECT_NAME} DESTINATION ${C15_INSTALL_PATH}/${PROJECT_NAME})
 
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
-addConfiguration()
+include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)
 deb("nltools" "Bridge from LPC to EPC on NL C15 Synthesizer")

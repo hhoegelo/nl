@@ -22,8 +22,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION lib)
-install(DIRECTORY "${CMAKE_SOURCE_DIR}/include/" DESTINATION "include")
+install(FILES ${HEADER_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
 
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
-addConfiguration()
+include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)
 deb("" "Tools library for Nonlinear Labs software")

@@ -1,0 +1,122 @@
+{
+  "layouts": {
+    "Single-Sound-Select-Layout": {
+      "Selector": {
+        "UIFocus": "Sound",
+        "UIMode": "Select",
+        "UIDetail": "Init"
+      },
+      "Conditions": [
+        "isSplitSound"
+      ],
+      "Controls": {
+        "Header": {
+          "Class": "InvertedLabel",
+          "Position": "0, 0",
+          "Events": "EditBufferTypeText => Text[Text]"
+        },
+        "Name": {
+          "Class": "WideHighlightLabel",
+          "Position": "64, 0",
+          "Events": "CurrentVoiceGroupLabel => Text[Text]"
+        },
+        "ButtonA": {
+          "Class": "Button",
+          "Position": "BUTTON_A",
+          "Events": "SelectVGButtonText => Text[Text]"
+        },
+        "ButtonB": {
+          "Class": "Button",
+          "Position": "BUTTON_B",
+          "Events": "SoundParamsButtonText => Text[Text]"
+        },
+        "ButtonC": {
+          "Class": "Button",
+          "Position": "BUTTON_C",
+          "Init": {
+            "Text[Text]": "Voices.."
+          },
+          "Events": "SoundVoicesButtonText => Text[Text]"
+        },
+        "ButtonD": {
+          "Class": "Button",
+          "Position": "BUTTON_D",
+          "Init": {
+            "Text[Text]": "Master.."
+          },
+          "Events": "SoundMasterButtonText => Text[Text]"
+        },
+        "Left": {
+          "Class": "SplitVoiceGroupI",
+          "Position": "43, 17",
+          "Init": {
+            "VoiceGroupIdentifier[Text]": "I",
+            "UpperText[Text]": "+12.00 st",
+            "LowerText[Text]": "-3.5 dB",
+            "ANY[Highlight]": "true"
+          },
+          "Events": "isCurrentVGI => ANY[Highlight], VGIMasterTuneText => LowerText[Text], VGIMasterVolumeText => UpperText[Text]"
+        },
+        "Right": {
+          "Class": "SplitVoiceGroupII",
+          "Position": "143, 17",
+          "Init": {
+            "VoiceGroupIdentifier[Text]": "II",
+            "UpperText[Text]": "+12.00 st",
+            "LowerText[Text]": "-3.5 dB",
+            "ANY[Highlight]": "false"
+          },
+          "Events": "isCurrentVGII => ANY[Highlight], VGIIMasterTuneText => LowerText[Text], VGIIMasterVolumeText => UpperText[Text]"
+        },
+        "SplitSyncedLine": {
+          "Class": "SplitPointLine",
+          "Position": "128, 29",
+          "Events": "SplitPointDefaultBehaviourWithoutSync => ANY[Visibility]"
+        },
+        "SplitI": {
+          "Class": "SplitPointI",
+          "Position": "113, 20",
+          "Events": "SplitPointIValue => Text[Text], SyncSplitDisabled => ANY[Visibility], isCurrentVGI => ANY[Highlight]"
+        },
+        "SplitII": {
+          "Class": "SplitPointII",
+          "Position": "119, 34",
+          "Events": "SplitPointIIValue => Text[Text], SyncSplitDisabled => ANY[Visibility], isCurrentVGII => ANY[Highlight]"
+        },
+        "SplitSynced": {
+          "Class": "SplitPoint",
+          "Position": "114, 17",
+          "Events": "SplitPointValue => Text[Text], SyncSplitEnabled => ANY[Visibility]"
+        },
+        "I_TO_II": {
+          "Class": "SplitFBImage",
+          "Position": "11, 23",
+          "Init": {
+            "Image[ImagePath]": "Split_FX_B.png",
+            "Image[Visibility]": "false"
+          },
+          "Events": "ToFXIIOver0 => ANY[Visibility]"
+        },
+        "II_TO_I": {
+          "Class": "SplitFBImage",
+          "Position": "213, 21",
+          "Init": {
+            "Image[ImagePath]": "Split_FX_A.png",
+            "Image[Visibility]": "false"
+          },
+          "Events": "ToFXIOver0 => ANY[Visibility]"
+        }
+      },
+      "EventSinks": {
+        "BUTTON_A": "ToggleVoiceGroup",
+        "BUTTON_B": "OpenPartScreen",
+        "BUTTON_C": "SwitchToVoicesDetail",
+        "BUTTON_D": "OpenMasterParameter",
+        "BUTTON_INC": "IncSplitPoint",
+        "BUTTON_DEC": "DecSplitPoint",
+        "ROTARY_PLUS": "IncSplitPoint",
+        "ROTARY_MINUS": "DecSplitPoint"
+      }
+    }
+  }
+}

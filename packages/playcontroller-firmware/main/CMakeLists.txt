@@ -27,5 +27,5 @@ add_custom_command(
   COMMAND arm-none-eabi-objcopy -Obinary ${PROJECT_NAME})
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
-addConfiguration()
+include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)
 deb("" "C15 Playcontroller firmware")

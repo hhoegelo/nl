@@ -48,4 +48,4 @@ add_custom_command(
       --rename-section .data_RAM4=".core_m0app.data_RAM4" 
       --rename-section .data_RAM5=".core_m0app.data_RAM5" ${PROJECT_NAME} ${PROJECT_NAME}.o)
 
-addConfiguration()
+include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)

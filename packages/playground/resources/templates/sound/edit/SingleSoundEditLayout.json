@@ -1,0 +1,38 @@
+{
+  "layouts": {
+    "Single-Sound-Edit-Layout": {
+      "Selector": {
+        "UIFocus": "Sound",
+        "UIMode": "Edit",
+        "UIDetail": "Init"
+      },
+      "Conditions": [
+        "isSingleSound"
+      ],
+      "Controls": {
+        "FocusHeader": {
+          "Class": "InvertedLabel",
+          "Position": "0, 0",
+          "Init": {
+            "Text[Text]": "Single Sound"
+          }
+        },
+        "VoiceGroupHeader": {
+          "Class": "WideInvertedLabel",
+          "Position": "64, 0"
+        },
+        "EditTextHeader": {
+          "Class": "InvertedLabel",
+          "Position": "192, 0",
+          "Init": {
+            "Text[Text]": "Edit"
+          }
+        },
+        "Content": {
+          "Class": "SingleSoundEditMenu",
+          "Position": "0, 16"
+        }
+      }
+    }
+  }
+}

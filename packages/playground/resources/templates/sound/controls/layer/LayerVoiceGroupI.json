@@ -1,0 +1,145 @@
+{
+  "controls": {
+    "LayerVoiceGroupI": {
+      "VoiceGroupIdentifier": {
+        "Class": "Text",
+        "Rect": "1, 1, 10, 13",
+        "Tag": "ident"
+      },
+      "Background": {
+        "Class": "Bar",
+        "Rect": "11, 1, 129, 13",
+        "Tag": "Background"
+      },
+      "Border-Fake": {
+        "Class": "Bar",
+        "Rect": "0, 2, 2, 13",
+        "Tag": "bar-l"
+      },
+      "Border-Fake2": {
+        "Class": "Bar",
+        "Rect": "140, 2, 2, 13",
+        "Tag": "bar-l"
+      },
+      "Border-pixel": {
+        "Class": "Bar",
+        "Rect": "140, 1, 1, 1",
+        "Tag": "pixel"
+      },
+      "Cover-Right": {
+        "Class": "Bar",
+        "Rect": "142, 0, 1, 15",
+        "Tag": "Cover"
+      },
+      "Cover-Right2": {
+        "Class": "Bar",
+        "Rect": "142, 1, 1, 1",
+        "Tag": "Cover"
+      },
+      "Cover-Right3": {
+        "Class": "Bar",
+        "Rect": "140, 0, 1, 1",
+        "Tag": "Cover"
+      },
+      "Cover-Background-R": {
+        "Class": "Bar",
+        "Rect": "140, 2, 1, 12",
+        "Tag": "Background"
+      },
+      "Border": {
+        "Class": "Border",
+        "Rect": "0, 0, 142, 15"
+      },
+      "Master": {
+        "Class": "Text",
+        "Rect": "15, 0, 50, 15",
+        "Tag": "ParamText"
+      },
+      "Unison": {
+        "Class": "Text",
+        "Rect": "90, 0, 50, 15",
+        "Tag": "ParamText"
+      },
+      "MuteIndication": {
+        "Class": "Text",
+        "Rect": "70, 2, 15, 11",
+        "Tag": "ParamText"
+      }
+    }
+  },
+  "styles": {
+    "TextIdentifier": {
+      "selector": {
+        "PrimitiveClass": "Text",
+        "PrimitiveInstances": "VoiceGroupIdentifier",
+        "ControlClasses": "LayerVoiceGroupI"
+      },
+      "styles": {
+        "HighlightBackgroundColor": "C255",
+        "BackgroundColor": "C128",
+        "HighlightColor": "C43",
+        "Color": "C43",
+        "FontSize": 8,
+        "FontDecoration": "Regular",
+        "TextAlign": "Center"
+      }
+    },
+    "Border": {
+      "selector": {
+        "PrimitiveClass": "Border",
+        "ControlClasses": "LayerVoiceGroupI"
+      },
+      "styles": {
+        "BorderStyle": "Rounded"
+      }
+    },
+    "Bar": {
+      "selector": {
+        "PrimitiveClass": "Bar",
+        "ControlClasses": "LayerVoiceGroupI",
+        "Tag": "Background"
+      },
+      "styles": {
+        "Color": "C77",
+        "HighlightColor": "C77"
+      }
+    },
+    "Cover": {
+      "selector": {
+        "PrimitiveClass": "Bar",
+        "ControlClasses": "LayerVoiceGroupI",
+        "Tag": "Cover"
+      },
+      "styles": {
+        "Color": "C43",
+        "HighlightColor": "C43"
+      }
+    },
+    "BorderPixel": {
+      "selector": {
+        "PrimitiveClass": "Bar",
+        "ControlClasses": "LayerVoiceGroupI",
+        "Tag": "pixel"
+      },
+      "styles": {
+        "Color": "C128",
+        "HighlightColor": "C255"
+      }
+    },
+    "ParamValue": {
+      "selector": {
+        "PrimitiveClass": "Text",
+        "ControlClasses": "LayerVoiceGroupI",
+        "Tag": "ParamText"
+      },
+      "styles": {
+        "Color": "C255",
+        "BackgroundColor": "Transparent",
+        "HighlightBackgroundColor": "Transparent",
+        "HighlightColor": "C255",
+        "TextAlign": "Center",
+        "FontDecoration": "Regular"
+      }
+    }
+  }
+}
