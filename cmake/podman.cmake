@@ -71,6 +71,7 @@ function(crossBuild NAME)
         COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot
         COMMAND dpkg-deb -x ${PACKAGE_DEPS}.deb ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot 
+        COMMAND touch .${PACKAGE}-sysroot
       )
     else()
       add_custom_command(

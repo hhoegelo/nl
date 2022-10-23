@@ -6,7 +6,7 @@ RUN pacman --noconfirm -S archlinux-keyring
 RUN pacman-key --populate
 
 # create a system capabale of building uefi-isos
-ENV DOCKER_PACKAGES="arch-install-scripts pacman-contrib dosfstools archiso erofs-utils"
+ENV DOCKER_PACKAGES="arch-install-scripts pacman-contrib dosfstools archiso erofs-utils sudo binutils"
 RUN sed -i 's/^SigLevel.*/SigLevel = Optional TrustAll/g' /etc/pacman.conf
 RUN echo "RemoteFileSigLevel = Optional TrustAll" >> /etc/pacman.conf
 RUN echo "Server = https://archive.archlinux.org/repos/2022/10/01/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist
@@ -14,12 +14,33 @@ RUN pacman --noconfirm -Sy
 RUN pacman --noconfirm -Su $DOCKER_PACKAGES 
 
 # download packages forming the factory os
-ENV FACTORY_ROOTFS_PACKAGES="sudo binutils linux-rt mc nano mkinitcpio mkinitcpio-nfs-utils rsync grub efibootmgr linux-firmware vi"
+ENV FACTORY_ROOTFS_PACKAGES="archlinux-keyring sudo binutils linux-rt mc nano mkinitcpio mkinitcpio-nfs-utils rsync grub efibootmgr linux-firmware vi"
 RUN echo "[realtime]" >> /etc/pacman.conf
 RUN echo "Server = https://pkgbuild.com/~dvzrv/repos/realtime/x86_64/" >> /etc/pacman.conf
 RUN pacman --noconfirm -Sy
 RUN echo "$FACTORY_ROOTFS_PACKAGES" | sed -e 's/ /\n/g' | xargs -i pactree -s -u {} | sort -u > /packages
+RUN rm -rf /var/cache/pacman/pkg/
+RUN mkdir -p /var/cache/pacman/pkg
 RUN pacman --noconfirm -Sw $(cat /packages)
+RUN mv /var/cache/pacman/pkg /factory-packages
+RUN mkdir /factory-packages-database
+RUN repo-add -q /factory-packages-database/epc-base.db.tar.zst /factory-packages/*.zst
+RUN repo-add -q /factory-packages-database/epc-base.db.tar.zst /factory-packages/*.xz
+RUN mv /factory-packages-database/* /factory-packages
+
+ADD generatePkgBuild.sh sda.sfdisk install-factory-os.sh install.sh /
+ADD hook/ /hook
+ADD install/ /install
+RUN mkdir /epc-meta
+RUN chmod 777 /epc-meta
+RUN /generatePkgBuild.sh > /epc-meta/PKGBUILD
+RUN ln -s /install.sh /epc-meta/install.sh
+RUN PACKAGES=$(cat /packages | sed "s/\(.*\)/'\1'/g")
+RUN sed -i 's/#PACKAGES#/$PACKAGES/g' /epc-meta/PKGBUILD
+RUN useradd bob
+USER bob
+RUN cd /epc-meta && makepkg -d -s -f
+USER root
 
 # prepare iso generation
 ENV ISO_PACKAGES="arch-install-scripts base dosfstools efibootmgr erofs-utils linux mkinitcpio mkinitcpio-archiso nano syslinux"
@@ -30,7 +51,8 @@ ADD install-factory-os.sh /archlive/airootfs/install-factory-os.sh
 RUN ln -s install-factory-os.sh /archlive/airootfs/runme.sh
 RUN echo "$ISO_PACKAGES" | sed -e 's/ /\n/g' > /archlive/packages.x86_64
 RUN mkdir -p /archlive/airootfs/packages
-RUN mv /var/cache/pacman/pkg/* /archlive/airootfs/packages
+RUN mv /factory-packages/* /archlive/airootfs/packages
+RUN mv /epc-meta/* /archlive/airootfs/packages/
 
 RUN echo "Server = https://archive.archlinux.org/repos/2022/10/01/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist
 RUN pacman --noconfirm -Sy

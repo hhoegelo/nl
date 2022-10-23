@@ -14,6 +14,10 @@ SET(PLAYGROUND_PRESETLOAD_LOG_PORT  8892)
 SET(SYNCJS_WEBSOCKET_PORT           8893)
 SET(LIBNAME ${PROJECT_NAME})
 
+if(NOT ARCHITECTURE)
+  SET(ARCHITECTURE native)
+endif()
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBS REQUIRED glibmm-2.4 giomm-2.4 gio-unix-2.0 freetype2 uuid libpng libsoup-2.4)
 

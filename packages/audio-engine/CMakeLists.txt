@@ -4,6 +4,10 @@ project(audio-engine VERSION 1.0.1)
 SET(RECORDER_WEBSOCKET_PORT 8889)
 SET(RECORDER_HTTPSERVER_PORT 8890)
 
+if(NOT ARCHITECTURE)
+  SET(ARCHITECTURE native)
+endif()
+
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
 
@@ -15,7 +19,7 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
-target_compile_options(${PROJECT_NAME} PRIVATE -march=native)
+target_compile_options(${PROJECT_NAME} PRIVATE -march=${ARCHITECTURE})
 target_compile_options(${PROJECT_NAME} PRIVATE ${OpenMP_CXX_FLAGS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE RECORDER_WEBSOCKET_PORT=${RECORDER_WEBSOCKET_PORT} RECORDER_HTTPSERVER_PORT=${RECORDER_HTTPSERVER_PORT})

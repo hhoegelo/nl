@@ -1,0 +1,1 @@
+SET(ARCHITECTURE broadwell)
