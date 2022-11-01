@@ -5,6 +5,7 @@ project(nl)
 include(CTest)
 include(cmake/podman.cmake)
 
+SET(NONLINEARLABS_SERVER "https://h2949050.stratoserver.net/")
 SET(PODMAN_REGISTRY quelltextlabor.de:5000)
 
 add_subdirectory(cmake)

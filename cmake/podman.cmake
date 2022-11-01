@@ -33,6 +33,8 @@ function(crossBuild NAME)
   # commands for cross building all the desired packages
   foreach(PACKAGE ${ARGN})
 
+    message("Processing package ${PACKAGE}")
+
     string(REGEX MATCH \\[.*\\] PACKAGE_DEPS ${PACKAGE})
     string(REGEX REPLACE \\[ "" PACKAGE_DEPS "${PACKAGE_DEPS}")
     string(REGEX REPLACE \\] "" PACKAGE_DEPS "${PACKAGE_DEPS}")
@@ -64,13 +66,32 @@ function(crossBuild NAME)
 
     if(PACKAGE_DEPS)
       add_custom_command(
-        COMMENT "Prepare sysroot for x-build for ${PACKAGE} for ${TARGET_MACHINE}"
-        OUTPUT .${PACKAGE}-sysroot
-        DEPENDS ${PACKAGE_DEPS}
-        DEPENDS ${PACKAGE_DEPS}.deb
+        COMMENT "Clean up sysroot for x-build for ${PACKAGE} for ${TARGET_MACHINE}"
+        OUTPUT .${PACKAGE}-sysroot-clean
         COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot
-        COMMAND dpkg-deb -x ${PACKAGE_DEPS}.deb ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot 
+        COMMAND touch .${PACKAGE}-sysroot-clean
+      )
+
+      foreach(DEP ${PACKAGE_DEPS})
+        add_custom_command(
+          COMMENT "Prepare sysroot for x-build for ${PACKAGE} for ${TARGET_MACHINE} - install ${DEP}"
+          OUTPUT .${PACKAGE}-sysroot-${DEP}
+          DEPENDS .${PACKAGE}-sysroot-clean
+          #DEPENDS ${DEP}
+          DEPENDS ${DEP}.deb
+          COMMAND dpkg-deb -x ${DEP}.deb ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot 
+          COMMAND touch .${PACKAGE}-sysroot-${DEP}
+        )
+      endforeach()
+
+      list(TRANSFORM PACKAGE_DEPS PREPEND ".${PACKAGE}-sysroot-" OUTPUT_VARIABLE DEB_INSTALL_TARGET)
+      message("DEB_INSTALL_TARGET: ${DEB_INSTALL_TARGET}")
+
+      add_custom_command(
+        COMMENT "Prepare sysroot for x-build for ${PACKAGE} for ${TARGET_MACHINE}"
+        OUTPUT .${PACKAGE}-sysroot
+        DEPENDS ${DEB_INSTALL_TARGET}
         COMMAND touch .${PACKAGE}-sysroot
       )
     else()
@@ -92,7 +113,6 @@ function(crossBuild NAME)
       DEPENDS .${PACKAGE}-sysroot
       VERBATIM
       COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}
-      # COMMAND ${RUN_POD} bash
       COMMAND ${RUN_POD} cmake -G Ninja -DCROSS_BUILD=On ${TOOLCHAIN} /src
       COMMAND ${RUN_POD} ninja -C /build install
       COMMAND ${RUN_POD} cpack -D CPACK_PACKAGE_FILE_NAME=${PACKAGE}

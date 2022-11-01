@@ -2,28 +2,15 @@ cmake_minimum_required(VERSION 3.0)
 
 project(mc-view)
 
-file(GLOB_RECURSE ALL_FILES *)
+include(GNUInstallDirs)
 
-configure_file(build-time-info.js build-time-info.js @ONLY)
+file(GLOB ALL_FONTS fonts/*)
+file(GLOB ALL_SRC *.css *.otf *.js *.png *.ico *.html *.js *.svg ${CMAKE_CURRENT_BINARY_DIR}/build-time-info.js)
 
-add_custom_command(
-    COMMENT "MC View - staging"
-    OUTPUT .staging
-    DEPENDS ${ALL_FILES}
-    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/build-time-info.js
-    COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/staging
-    COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/staging
-    COMMAND cp -r ${CMAKE_CURRENT_SOURCE_DIR}/* ${CMAKE_CURRENT_BINARY_DIR}/staging
-    COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build-time-info.js ${CMAKE_CURRENT_BINARY_DIR}/staging
-    COMMAND touch .staging
-    )
+configure_file(build-time-info.js.in build-time-info.js @ONLY)
 
-add_custom_command(
-    COMMENT "MC View"
-    OUTPUT bundle.tar.gz
-    DEPENDS .staging
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/staging
-    COMMAND tar czf ${CMAKE_CURRENT_BINARY_DIR}/bundle.tar.gz ./*
-    )
+install(FILES ${ALL_SRC} DESTINATION ${CMAKE_INSTALL_DATADIR}/mc-view)
+install(FILES ${ALL_FONTS} DESTINATION ${CMAKE_INSTALL_DATADIR}/mc-view/fonts)
 
-add_custom_target(mc-view ALL DEPENDS bundle.tar.gz)
+include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
+deb("" "Browser based Macro Control User Interface for Nonlinear Labs synthesizers")

@@ -1,41 +1,44 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.18)
 project(nonmaps)
 
+include(GNUInstallDirs)
+
 file(GLOB_RECURSE SOURCE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*)
+set(GWT_VERSION 2.10.0)
 
-IF(NOT GWT_PATH)
-  message(FATAL_ERROR "You have to specifiy the path to a GWT installation like this: cmake -DGWT_PATH=/unpacked/gwt/zip")
-  message(FATAL_ERROR "GWT can be doenloaded at https://github.com/gwtproject/gwt/releases/download/2.10.0/gwt-2.10.0.zip")
+IF(NOT CROSS_BUILD)
+  set(GWT_INSTALL_PATH ${CMAKE_CURRENT_BINARY_DIR}/gwt)
+  if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/gwt-${GWT_VERSION}.zip)
+    file(DOWNLOAD ${NONLINEARLABS_SERVER}/web/gwt-${GWT_VERSION}.zip ${CMAKE_CURRENT_BINARY_DIR}/gwt-${GWT_VERSION}.zip SHOW_PROGRESS)
+    file(ARCHIVE_EXTRACT INPUT ${CMAKE_CURRENT_BINARY_DIR}/gwt-${GWT_VERSION}.zip DESTINATION ${GWT_INSTALL_PATH})
+  endif()
+  set(GWT_PATH ${GWT_INSTALL_PATH}/gwt-${GWT_VERSION})
 endif()
-
-add_custom_command(
-  COMMENT "Generate nonmaps-version.txt"
-  DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/nonmaps-version.txt
-  DEPENDS ${CMAKE_SOURCE_DIR}/cmake/generate-version.cmake
-  DEPENDS ${CMAKE_SOURCE_DIR}/.git/index
-  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-  COMMAND ${CMAKE_COMMAND}
-    -D INPUT_FILE=${CMAKE_CURRENT_SOURCE_DIR}/nonmaps-version.txt
-    -D OUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/nonmaps-version.txt
-    -P ${CMAKE_SOURCE_DIR}/cmake/generate-version.cmake
-  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/nonmaps-version.txt     
-)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/main/webapp/NonMaps.js.in ${CMAKE_CURRENT_BINARY_DIR}/NonMaps.js @ONLY)
 
 add_custom_command(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/war/nonmaps/compilation-mappings.txt
-  COMMAND /usr/bin/java -Xmx512m -classpath ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java:${CMAKE_CURRENT_BINARY_DIR}/gwt-${GWT_VERSION}/gwt-user.jar:${CMAKE_CURRENT_BINARY_DIR}/gwt-${GWT_VERSION}/gwt-dev.jar:${CMAKE_CURRENT_BINARY_DIR}/gwt-${GWT_VERSION}/gwt-elemental.jar com.google.gwt.dev.Compiler -optimize 9 -gen ${CMAKE_CURRENT_BINARY_DIR}/obj -logLevel WARN -style OBF -war ./war -localWorkers 4 com.nonlinearlabs.NonMaps
-  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/gwt-${GWT_VERSION}/gwt-dev.jar
+  COMMAND 
+    /usr/bin/java 
+      -Xmx512m 
+      -classpath ${CMAKE_CURRENT_SOURCE_DIR}/src/main/java:${GWT_PATH}/gwt-user.jar:${GWT_PATH}/gwt-dev.jar:${GWT_PATH}/gwt-elemental.jar 
+      com.google.gwt.dev.Compiler 
+        -optimize 9 
+        -gen ${CMAKE_CURRENT_BINARY_DIR}/obj 
+        -logLevel WARN 
+        -style OBF 
+        -war ./war 
+        -localWorkers 4 
+        com.nonlinearlabs.NonMaps
   DEPENDS ${SOURCE_FILES})
 
-add_custom_target(nonmaps 
-  DEPENDS ./war/nonmaps/compilation-mappings.txt
-  DEPENDS ./nonmaps-version.txt)
+add_custom_target(nonmaps ALL
+  DEPENDS ./war/nonmaps/compilation-mappings.txt)
 
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/war/nonmaps/ DESTINATION ${CMAKE_INSTALL_DATADIR}/nonmaps)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/main/webapp/ DESTINATION ${CMAKE_INSTALL_DATADIR}/nonmaps)
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/NonMaps.js ${CMAKE_CURRENT_BINARY_DIR}/nonmaps-version.txt DESTINATION ${CMAKE_INSTALL_DATADIR}/nonmaps)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/NonMaps.js DESTINATION ${CMAKE_INSTALL_DATADIR}/nonmaps)
 
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
 deb("" "Browser based User Interface for Nonlinear Labs synthesizers")

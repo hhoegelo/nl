@@ -1,8 +1,4 @@
 - authentication for docker registry (read everyone, write restricted)
 - web (make each project a first class citizen)
-
-- nltools test x-build missing catch.h
-- epc => iso burn with packages, add script to install target system
-
-
-
+- version should be generated at configuration stage and injected or included accordingly
+- configure NonMaps.js.in?

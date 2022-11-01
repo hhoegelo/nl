@@ -1,0 +1,1 @@
+SET(GWT_PATH /gwt-2.10.0)

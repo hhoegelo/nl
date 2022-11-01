@@ -11,10 +11,9 @@
     "forceConsistentCasingInFileNames": true,
     "inlineSourceMap": true,
     "inlineSources": true,
-    "outFile": "/builddir/recorder.js"
+    "outFile": "./recorder.js"
   },
   "include": [
-    "/src/*.ts",
-    "/builddir/*.ts",
+    "./*.ts"
   ]
 }

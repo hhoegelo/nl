@@ -5,5 +5,4 @@ RUN pacman --noconfirm -Sy
 RUN pacman --noconfirm -S archlinux-keyring
 RUN pacman-key --populate
 
-RUN pacman --noconfirm -Syyuu && pacman --noconfirm -S cmake gcc make pkg-config glibmm libsoup boost libpng freetype2 alsa-lib libpng flac util-linux-libs png++
-RUN pacman --noconfirm -Syyuu && pacman --noconfirm -S ninja
+RUN pacman --noconfirm -Syyuu && pacman --noconfirm -S cmake gcc ninja pkg-config glibmm libsoup boost libpng freetype2 alsa-lib libpng flac util-linux-libs png++

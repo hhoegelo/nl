@@ -1,9 +1,11 @@
+add_subdirectory(audio-engine/)
 add_subdirectory(bridge/)
 add_subdirectory(midi-over-ip/)
 add_subdirectory(nltools/)
 add_subdirectory(nonmaps/)
+add_subdirectory(online-help/)
 add_subdirectory(playground/)
-add_subdirectory(audio-engine/)
+add_subdirectory(recorder/)
 
 if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "ARM")
     message("Building playcontroller")

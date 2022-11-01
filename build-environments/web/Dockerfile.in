@@ -5,7 +5,16 @@ RUN pacman --noconfirm -Sy
 RUN pacman --noconfirm -S archlinux-keyring
 RUN pacman-key --populate
 
-RUN pacman --noconfirm -Syyuu && pacman --noconfirm -S nodejs npm jre17-openjdk-headless
-RUN npm install -g meteor jquery @types/meteor meteor-build-client@0.4.1 typescript
-RUN meteor add kadira:flow-router blaze-html-templates jquery kadira:blaze-layout autoupdate typescript reactive-var meteortesting:mocha less smallhacks:jquery-contextmenu
-RUN wget https://github.com/gwtproject/gwt/releases/download/2.10.0/gwt-2.10.0.zip | unzip
+RUN pacman --noconfirm -Syyuu && pacman --noconfirm -S wget nodejs npm jre17-openjdk-headless sudo unzip cmake ninja pkg-config gcc
+
+RUN wget https://github.com/gwtproject/gwt/releases/download/2.10.0/gwt-2.10.0.zip
+RUN unzip gwt-2.10.0.zip
+
+RUN npm install -g n
+RUN n 14.20.0
+RUN npm install -g --unsafe-perm meteor jquery @types/meteor meteor-build-client@0.4.1 typescript
+ENV PATH="${PATH}:/root/.meteor"
+RUN meteor --allow-superuser create --minimal app
+WORKDIR /app
+RUN meteor --allow-superuser add kadira:flow-router blaze-html-templates jquery kadira:blaze-layout autoupdate typescript reactive-var meteortesting:mocha less smallhacks:jquery-contextmenu
+
