@@ -78,7 +78,7 @@ function(crossBuild NAME)
           COMMENT "Prepare sysroot for x-build for ${PACKAGE} for ${TARGET_MACHINE} - install ${DEP}"
           OUTPUT .${PACKAGE}-sysroot-${DEP}
           DEPENDS .${PACKAGE}-sysroot-clean
-          #DEPENDS ${DEP}
+          DEPENDS ${DEP}
           DEPENDS ${DEP}.deb
           COMMAND dpkg-deb -x ${DEP}.deb ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot 
           COMMAND touch .${PACKAGE}-sysroot-${DEP}
@@ -127,7 +127,6 @@ function(crossBuild NAME)
     COMMENT "Build ${NAME}"
     DEPENDS ${DEPENDENCIES}
     OUTPUT ${NAME}.tar.gz
-    COMMAND echo "pack the deps into a tar gz"
     COMMAND tar -czf ${NAME}.tar.gz -C ${CMAKE_CURRENT_BINARY_DIR} ${DEPENDENCIES_FILES}
   )
 
