@@ -16,6 +16,7 @@ function(registerPod DEPENDECIES)
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile
       DEPENDS ${DEPENDECIES}
       VERBATIM
+      COMMAND echo "HUHU!"
       COMMAND ${CMAKE_CURRENT_BINARY_DIR}/runPodman.sh
       COMMAND touch .podman-${DOCKERFILE_SHA1}
       )
