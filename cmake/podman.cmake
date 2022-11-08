@@ -115,6 +115,7 @@ function(crossBuild NAME)
       COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}
       COMMAND mkdir -p ${CMAKE_BINARY_DIR}/ccache
       COMMAND ${RUN_POD} cmake -DCROSS_BUILD=On ${TOOLCHAIN} -D CMAKE_BUILD_TYPE=Release /src
+      #COMMAND ${RUN_POD} bash
       COMMAND ${RUN_POD} cmake --build .
       COMMAND ${RUN_POD} cmake --install .
       COMMAND ${RUN_POD} cpack -D CPACK_PACKAGE_FILE_NAME=${PACKAGE}

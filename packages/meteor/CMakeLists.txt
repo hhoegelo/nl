@@ -4,16 +4,24 @@ project(meteor)
 
 include(GNUInstallDirs)
 
+file(GLOB_RECURSE ALL_METEOR_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} .meteor/*)
+file(GLOB_RECURSE ALL_CLIENT_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} client/*)
+set(ALL_NODE_FILES .meteorignore package-lock.json package.json)
+
+foreach(FILE ${ALL_METEOR_FILES} ${ALL_CLIENT_FILES} ${ALL_NODE_FILES})
+    configure_file(${FILE} ${FILE} COPYONLY)
+endforeach()
+
 add_custom_command(
     COMMENT "Build Meteor App"
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/.meteor
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/out/index.html
     VERBATIM
-    COMMAND echo "foo bar" > ${CMAKE_CURRENT_BINARY_DIR}/.meteor
+    COMMAND node ${NODE_MODULES}/meteor-build-client/main.js ${CMAKE_CURRENT_BINARY_DIR}/out
     )
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/.meteor DESTINATION ${CMAKE_INSTALL_DATADIR}/meteor)
+install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/out/ DESTINATION ${CMAKE_INSTALL_DATADIR}/meteor)
 
-add_custom_target(meteor ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/.meteor)
+add_custom_target(meteor ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/out/index.html)
 
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
 deb("" "Umbrella for various browser based UI applications for Nonlinear Labs synthesizers")
