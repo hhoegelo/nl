@@ -11,13 +11,14 @@ fi
 
 if ! podman run --tls-verify=false --authfile=$AUTH --rm @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@; then
     podman build -t @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@ .
+fi
 
-    A=$(jq -r ".auths.\"@PODMAN_REGISTRY@\".auth" $AUTH)
-    if echo "$A" | base64 -d | sed 's/\(.*\):.*/\1/' | grep "nonlinearlabs"; then
-        podman push --tls-verify=false generic:@DOCKERFILE_SHA1@ @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@
-    else
-        echo "For pushing the modifiend pod to NL server, you have to log in as user 'nonlinearlabs'!:"
-        echo "podman login --tls-verify=false --authfile=$AUTH --username nonlinearlabs @PODMAN_REGISTRY@"
-    fi
+A=$(jq -r ".auths.\"@PODMAN_REGISTRY@\".auth" $AUTH)
+
+if echo "$A" | base64 -d | sed 's/\(.*\):.*/\1/' | grep "nonlinearlabs"; then
+    podman push --tls-verify=false --authfile=$AUTH generic:@DOCKERFILE_SHA1@ @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@
+else
+    echo "For pushing the modifiend pod to NL server, you have to log in as user 'nonlinearlabs'!:"
+    echo "podman login --tls-verify=false --authfile=$AUTH --username nonlinearlabs @PODMAN_REGISTRY@"
 fi
 
