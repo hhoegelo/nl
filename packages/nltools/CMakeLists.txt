@@ -22,8 +22,8 @@ link_directories(${LIB_LIBRARY_DIRS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 
-INSTALL(TARGETS ${PROJECT_NAME})
-INSTALL(DIRECTORY ./include/ TYPE INCLUDE)
+INSTALL(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+INSTALL(DIRECTORY ./include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
 include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)

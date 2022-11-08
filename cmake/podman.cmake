@@ -14,14 +14,14 @@ function(registerPod DEPENDECIES)
       COMMENT "Provide Podman for ${BUILD_TASK}/${TARGET_MACHINE}/${DOCKERFILE_SHA1}"
       OUTPUT .podman-${DOCKERFILE_SHA1}
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile
+      DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/runPodman.sh
       DEPENDS ${DEPENDECIES}
       VERBATIM
-      COMMAND echo "HUHU!"
       COMMAND ${CMAKE_CURRENT_BINARY_DIR}/runPodman.sh
       COMMAND touch .podman-${DOCKERFILE_SHA1}
       )
     
-    message("Add pod ${POD_TARGET} for ${CMAKE_CURRENT_SOURCE_DIR}")
+    message("Add target ${POD_TARGET} for ${CMAKE_CURRENT_SOURCE_DIR}")
     add_custom_target(${POD_TARGET} DEPENDS .podman-${DOCKERFILE_SHA1})
   endif()
 endfunction()
@@ -55,6 +55,7 @@ function(crossBuild NAME)
       -v ${CMAKE_BINARY_DIR}/shared:/build/shared
       -v ${CMAKE_BINARY_DIR}/cmake:/build/cmake
       -v ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot:/staging
+      -v ${CMAKE_BINARY_DIR}/ccache:/root/.ccache
       -w /build
       ${PODMAN_REGISTRY}/generic:${DOCKERFILE_SHA1})
 
@@ -79,7 +80,6 @@ function(crossBuild NAME)
           COMMENT "Prepare sysroot for x-build for ${PACKAGE} for ${TARGET_MACHINE} - install ${DEP}"
           OUTPUT .${PACKAGE}-sysroot-${DEP}
           DEPENDS .${PACKAGE}-sysroot-clean
-          DEPENDS ${DEP}
           DEPENDS ${DEP}.deb
           COMMAND dpkg-deb -x ${DEP}.deb ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot 
           COMMAND touch .${PACKAGE}-sysroot-${DEP}
@@ -87,7 +87,6 @@ function(crossBuild NAME)
       endforeach()
 
       list(TRANSFORM PACKAGE_DEPS PREPEND ".${PACKAGE}-sysroot-" OUTPUT_VARIABLE DEB_INSTALL_TARGET)
-      message("DEB_INSTALL_TARGET: ${DEB_INSTALL_TARGET}")
 
       add_custom_command(
         COMMENT "Prepare sysroot for x-build for ${PACKAGE} for ${TARGET_MACHINE}"
@@ -99,7 +98,7 @@ function(crossBuild NAME)
       add_custom_command(
         COMMENT "No sysroot to prepare for x-build for ${PACKAGE} for ${TARGET_MACHINE}"
         OUTPUT .${PACKAGE}-sysroot
-        COMMAND COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot
+        COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE}-sysroot
         COMMAND touch .${PACKAGE}-sysroot
       )
     endif()
@@ -114,8 +113,10 @@ function(crossBuild NAME)
       DEPENDS .${PACKAGE}-sysroot
       VERBATIM
       COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}
-      COMMAND ${RUN_POD} cmake -G Ninja -DCROSS_BUILD=On ${TOOLCHAIN} /src
-      COMMAND ${RUN_POD} ninja -C /build install
+      COMMAND mkdir -p ${CMAKE_BINARY_DIR}/ccache
+      COMMAND ${RUN_POD} cmake -DCROSS_BUILD=On ${TOOLCHAIN} -D CMAKE_BUILD_TYPE=Release /src
+      COMMAND ${RUN_POD} cmake --build .
+      COMMAND ${RUN_POD} cmake --install .
       COMMAND ${RUN_POD} cpack -D CPACK_PACKAGE_FILE_NAME=${PACKAGE}
       COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}/${PACKAGE}.deb ${CMAKE_CURRENT_BINARY_DIR})
   endforeach()

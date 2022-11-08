@@ -5,3 +5,5 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update -y
 RUN apt-get install -y git gcc-arm-none-eabi cmake build-essential crossbuild-essential-armhf crossbuild-essential-armel pkg-config
+
+ENV CMAKE_GENERATOR="Unix Makefiles"

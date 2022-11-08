@@ -1,5 +1,6 @@
 FROM @BUILDROOT_POD_URI@
 
 ENV PATH=/nonlinux/output/host/usr/bin:$PATH
+ENV CMAKE_GENERATOR="Unix Makefiles"
 
 WORKDIR ~

@@ -18,3 +18,4 @@ RUN meteor --allow-superuser create --minimal app
 WORKDIR /app
 RUN meteor --allow-superuser add kadira:flow-router blaze-html-templates jquery kadira:blaze-layout autoupdate typescript reactive-var meteortesting:mocha less smallhacks:jquery-contextmenu
 
+ENV CMAKE_GENERATOR="Unix Makefiles"

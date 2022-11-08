@@ -3,10 +3,10 @@ project (playcontroller-firmware-main)
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
 
 file(GLOB_RECURSE SOURCES ./src/*.c ../shared/*.c)
-add_executable(${PROJECT_NAME} ${SOURCES} ../co-proc/playcontroller-firmware-coproc.o)
+add_executable(${PROJECT_NAME} ${SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/../co-proc/playcontroller-firmware-coproc.o)
 target_compile_options(${PROJECT_NAME} PRIVATE -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -fsingle-precision-constant -DCORE_M4)
 add_dependencies(${PROJECT_NAME} playcontroller-firmware-coproc)
-set_source_files_properties(../co-proc/playcontroller-firmware-coproc.o PROPERTIES GENERATED TRUE)
+set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/../co-proc/playcontroller-firmware-coproc.o PROPERTIES GENERATED TRUE)
 
 target_include_directories (${PROJECT_NAME} PRIVATE "./src")
 target_include_directories (${PROJECT_NAME} PRIVATE "../co-proc/src")
