@@ -1,7 +1,0 @@
-DONE - authentication for docker registry (read everyone, write restricted)
-DONE - web (make each project a first class citizen)
-- meteor project
-- version should be generated at configuration stage and injected or included accordingly
-- configure NonMaps.js.in?
-- ccache
-- fixate arch versions
