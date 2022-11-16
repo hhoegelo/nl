@@ -6,6 +6,7 @@ include(GNUInstallDirs)
 
 file(GLOB_RECURSE ALL_METEOR_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} .meteor/*)
 file(GLOB_RECURSE ALL_CLIENT_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} client/*)
+list(FILTER ALL_METEOR_FILES EXCLUDE REGEX .meteor/local/)
 set(ALL_NODE_FILES .meteorignore package-lock.json package.json)
 
 foreach(FILE ${ALL_METEOR_FILES} ${ALL_CLIENT_FILES} ${ALL_NODE_FILES})
