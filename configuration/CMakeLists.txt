@@ -26,7 +26,9 @@ add_custom_command(
         VERBATIM
         COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/generated
         COMMAND 
-            podman run -ti --tls-verify=false --rm 
+            podman run 
+            --authfile=${CMAKE_BINARY_DIR}/podman-authentication 
+            -ti --tls-verify=false --rm 
             -v ${CMAKE_CURRENT_SOURCE_DIR}:/root/src 
             -v ${CMAKE_CURRENT_BINARY_DIR}/generated:/generated 
             ${POD_URI} /root/src/process.sh

@@ -14,7 +14,9 @@ configure_file(tsconfig.json tsconfig.json)
 add_custom_command(
     COMMENT "Recorder"
     OUTPUT recorder.js
-    DEPENDS ${ALL_FILES}
+    DEPENDS ${FONT_FILES} 
+    DEPENDS ${IMG_FILES} 
+    DEPENDS ${SRC_FILES}
     COMMAND tsc --project ${CMAKE_CURRENT_BINARY_DIR}/tsconfig.json
 )
 

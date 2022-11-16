@@ -47,6 +47,7 @@ function(crossBuild NAME)
     
     string(REPLACE "-" "_" PACKAGE_CANONIC ${PACKAGE_CANONIC})
     set(RUN_POD podman run 
+      --authfile=${CMAKE_BINARY_DIR}/podman-authentication
       --tls-verify=false --rm -ti
       -v ${CMAKE_SOURCE_DIR}/packages/${PACKAGE}:/src 
       -v ${CMAKE_SOURCE_DIR}/build-environments/${TARGET_MACHINE}:/build-environment 
@@ -103,6 +104,8 @@ function(crossBuild NAME)
       )
     endif()
 
+    cmake_host_system_information(RESULT NUM_CORES QUERY NUMBER_OF_PHYSICAL_CORES)       
+  
     add_custom_command(
       COMMENT "X-Building ${PACKAGE} for ${TARGET_MACHINE}"
       OUTPUT ${PACKAGE}.deb
@@ -115,7 +118,6 @@ function(crossBuild NAME)
       COMMAND mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}
       COMMAND mkdir -p ${CMAKE_BINARY_DIR}/ccache
       COMMAND ${RUN_POD} cmake -DCROSS_BUILD=On ${TOOLCHAIN} -D CMAKE_BUILD_TYPE=Release /src
-      #COMMAND ${RUN_POD} bash
       COMMAND ${RUN_POD} cmake --build .
       COMMAND ${RUN_POD} cmake --install .
       COMMAND ${RUN_POD} cpack -D CPACK_PACKAGE_FILE_NAME=${PACKAGE}

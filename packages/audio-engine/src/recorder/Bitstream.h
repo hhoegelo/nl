@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <stdint.h>
-
+ 
 struct Bitstream
 {
   Bitstream(std::vector<uint8_t> &d);

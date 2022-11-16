@@ -1,6 +1,6 @@
 registerPod("")
 
-SET(RUN_POD podman run --tls-verify=false --rm -v ${CMAKE_CURRENT_BINARY_DIR}:/out  ${POD_URI})
+SET(RUN_POD podman run --authfile=${CMAKE_BINARY_DIR}/podman-authentication --tls-verify=false --rm -v ${CMAKE_CURRENT_BINARY_DIR}:/out  ${POD_URI})
 
 add_custom_command(
     COMMENT "Extract Staging from Buildroot"

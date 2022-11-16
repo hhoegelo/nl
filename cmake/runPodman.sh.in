@@ -1,6 +1,7 @@
 #!/bin/sh
 
 set -x
+set -e
 
 AUTH=@CMAKE_BINARY_DIR@/podman-authentication
 ANON="anonymous"

@@ -105,7 +105,6 @@ inline std::string toString(Initiator initiator) {
 }
 
 enum class PresetType : uint8_t { Single, Morph, Multi };
-
 enum class SaveResult : uint8_t { Nothing, Again, Finished };
 
 std::string getStackTrace(const std::string &prefix);
