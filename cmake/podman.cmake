@@ -122,6 +122,21 @@ function(crossBuild NAME)
       COMMAND ${RUN_POD} cmake --install .
       COMMAND ${RUN_POD} cpack -D CPACK_PACKAGE_FILE_NAME=${PACKAGE}
       COMMAND cp ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}/${PACKAGE}.deb ${CMAKE_CURRENT_BINARY_DIR})
+
+      if(DEVELOPMENT_TARGETS) 
+        list(FIND DEVELOPMENT_TARGETS ${PACKAGE} PACKAGE_IN_LIST_IDX)
+        if(NOT ${PACKAGE_IN_LIST_IDX} EQUAL -1)
+          add_custom_command(
+            COMMENT "Development environment for ${PACKAGE}"
+            OUTPUT .devenv-${PACKAGE}
+            DEPENDS ${PACKAGE}.deb
+            VERBATIM
+            COMMAND ${RUN_POD} cmake -DCROSS_BUILD=On ${TOOLCHAIN} -D CMAKE_BUILD_TYPE=Release /src && sleep 100)
+
+            add_custom_target(development-environment-${PACKAGE} DEPENDS .devenv-${PACKAGE})
+        endif()
+      endif()
+
   endforeach()
 
   list(TRANSFORM DEPENDENCIES APPEND .deb)

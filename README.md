@@ -8,3 +8,9 @@ The build system should solve:
 - caching of online resources for faster builds
 - building iso images, updates and binaries for development pc
 - integration of build-system-time configuration
+
+
+Todos:
+- pi4
+- develop environments
+- package update and attach scripts
