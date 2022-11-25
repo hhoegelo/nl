@@ -3,7 +3,7 @@ project(parameterDB-new)
 set(BUILD_TASK configuration)
 set(TARGET_MACHINE devpc)
 
-registerPod("package.json")
+registerPod("package.json" "package.json" "")
 
 include(GNUInstallDirs)
 

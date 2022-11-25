@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e
+set -x
 
 tweak_boot_partition() {
 

@@ -4,7 +4,7 @@ foreach(FILE ${DEPS})
   configure_file(${FILE} ${FILE} COPYONLY)
 endforeach()
 
-registerPod(${DEPS})
+registerPod("${DEPS}" "${DEPS}" "")
 
 SET(RUN_POD podman run --authfile=${CMAKE_BINARY_DIR}/podman-authentication -ti --privileged --tls-verify=false --rm -v ${CMAKE_CURRENT_BINARY_DIR}:/out  ${POD_URI})
 
