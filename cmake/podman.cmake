@@ -1,4 +1,4 @@
-function(registerPod DEPENDECIES)
+function(registerPod DEPENDENCIES)
   configure_file(Dockerfile.in ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile @ONLY)
   file(SHA1 ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile DOCKERFILE_SHA1)
 
@@ -15,7 +15,7 @@ function(registerPod DEPENDECIES)
       OUTPUT .podman-${DOCKERFILE_SHA1}
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/runPodman.sh
-      DEPENDS ${DEPENDECIES}
+      DEPENDS ${DEPENDENCIES}
       VERBATIM
       COMMAND ${CMAKE_CURRENT_BINARY_DIR}/runPodman.sh
       COMMAND touch .podman-${DOCKERFILE_SHA1}
@@ -131,7 +131,7 @@ function(crossBuild NAME)
             OUTPUT .devenv-${PACKAGE}
             DEPENDS ${PACKAGE}.deb
             VERBATIM
-            COMMAND ${RUN_POD} cmake -DCROSS_BUILD=On ${TOOLCHAIN} -D CMAKE_BUILD_TYPE=Release /src && sleep 100)
+            COMMAND ${RUN_POD} cmake -DCROSS_BUILD=On ${TOOLCHAIN} -D CMAKE_BUILD_TYPE=Release /src )
 
             add_custom_target(development-environment-${PACKAGE} DEPENDS .devenv-${PACKAGE})
         endif()

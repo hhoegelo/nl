@@ -5,6 +5,11 @@ project(nl)
 include(CTest)
 include(cmake/podman.cmake)
 
+find_program(PODMAN podman          REQUIRED)
+find_program(QEMU   qemu-arm-static REQUIRED)
+find_program(JQ     jq              REQUIRED)
+
+
 SET(NONLINEARLABS_SERVER "https://h2949050.stratoserver.net/")
 SET(PODMAN_REGISTRY quelltextlabor.de:5001)
 
