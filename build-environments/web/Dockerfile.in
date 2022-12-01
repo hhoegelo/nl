@@ -1,7 +1,7 @@
 FROM docker.io/node:14.21.1-bullseye-slim
 
-RUN apt -y update
-RUN apt -y install wget nodejs npm openjdk-17-jdk-headless sudo unzip cmake ninja-build make pkg-config gcc g++
+RUN apt-get -y update
+RUN apt-get -y install wget nodejs npm openjdk-17-jdk-headless sudo unzip cmake ninja-build make pkg-config gcc g++
 
 RUN wget https://github.com/gwtproject/gwt/releases/download/2.10.0/gwt-2.10.0.zip
 RUN unzip gwt-2.10.0.zip

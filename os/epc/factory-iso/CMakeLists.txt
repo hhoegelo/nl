@@ -1,10 +1,4 @@
-SET(DEPS sda.sfdisk install-factory-os.sh generatePkgBuild.sh install.sh hook/nlhook hook/oroot install/nlhook install/oroot)
-
-foreach(FILE ${DEPS})
-  configure_file(${FILE} ${FILE} COPYONLY)
-endforeach()
-
-registerPod("${DEPS}" "${DEPS}" "")
+registerPod(CONFIGURED_DEPENDENCIES_COPYONLY sda.sfdisk install-factory-os.sh generatePkgBuild.sh install.sh hook/nlhook hook/oroot install/nlhook install/oroot)
 
 SET(RUN_POD podman run --authfile=${CMAKE_BINARY_DIR}/podman-authentication -ti --privileged --tls-verify=false --rm -v ${CMAKE_CURRENT_BINARY_DIR}:/out  ${POD_URI})
 
