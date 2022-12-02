@@ -3,7 +3,7 @@ file(GLOB_RECURSE ROOT_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} root/*)
 
 registerPod(CONFIGURED_DEPENDENCIES_COPYONLY ${BOOT_FILES} ${ROOT_FILES} createRootFS.sh)
 
-SET(RUN_POD podman run --authfile=${CMAKE_BINARY_DIR}/podman-authentication -ti --privileged --tls-verify=false --rm -v ${CMAKE_CURRENT_BINARY_DIR}:/out  ${POD_URI})
+SET(RUN_POD podman run --privileged --authfile=${CMAKE_BINARY_DIR}/podman-authentication -ti --privileged --tls-verify=false --rm -v ${CMAKE_CURRENT_BINARY_DIR}:/out  ${POD_URI})
 
 add_custom_command(
     COMMENT "Build pi4 factory image"
