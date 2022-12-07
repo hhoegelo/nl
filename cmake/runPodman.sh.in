@@ -3,7 +3,7 @@
 set -e
 
 AUTH=@CMAKE_BINARY_DIR@/podman-authentication
-A=$(jq -r ".auths.\"@PODMAN_REGISTRY@\".auth" $AUTH)
+A=$(jq -r ".auths.\"@PODMAN_REGISTRY@\".auth" $AUTH || echo "")
 
 if [ "@DEVELOPER_ROLE@" = "developer" ]; then
     ANON="anonymous"
