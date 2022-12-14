@@ -1,8 +1,10 @@
 FROM docker.io/multiarch/debian-debootstrap:armhf-bullseye-slim 
 RUN apt -y update
-RUN apt -y install @PI4_PACKAGES@ zip
+RUN apt -y install @PI4_PACKAGES@ zip fuse2fs fdisk
 RUN dpkg -l | grep "^ii" | awk ' {print $2} ' | xargs apt-get -y install --reinstall --download-only
 
-ADD https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-11-08/2021-10-30-raspios-bullseye-armhf.zip /raspios.zip
-RUN unzip /raspios.zip
-RUN mv /2021-10-30-raspios-bullseye-armhf.img /raspios.img
+RUN mkdir /mnt/rootfs
+RUN mkdir /mnt/bootfs
+
+ADD https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-11-08/2021-10-30-raspios-bullseye-armhf.zip | unzip -p - | dd of=/rootfs.img skip=532480 count=7225344
+ADD https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2021-11-08/2021-10-30-raspios-bullseye-armhf.zip | unzip -p - | dd of=/bootfs.img skip=8192 count=524288

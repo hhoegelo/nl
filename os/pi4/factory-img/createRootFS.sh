@@ -4,7 +4,7 @@ set -e
 set -x
 
 tweak_boot_partition() {
-  OUT=/out/mnt/sda1
+  OUT=/mnt/boot
     
   [[ "$PI4_Model" =~ "CM4" ]] && mv /boot-files/* $OUT
   
@@ -33,22 +33,21 @@ tweak_boot_partition() {
 }
 
 disable_service() {
-  OUT=/out/mnt/sda2
+  OUT=/mnt/root
   NAME="$1"
   chroot $OUT rm -f /etc/systemd/system/multi-user.target.wants/$NAME
   chroot $OUT ln -s /dev/null /etc/systemd/system/multi-user.target.wants/$NAME 
 }
 
 enable_service() {
-  OUT=/out/mnt/sda2
+  OUT=/mnt/root
   NAME="$1"
   chroot $OUT rm -f /etc/systemd/system/multi-user.target.wants/$NAME
   chroot $OUT ln -s /usr/lib/systemd/system/$NAME /etc/systemd/system/multi-user.target.wants/$NAME 
 }
 
 tweak_root_partition() {
-  OUT=/out/mnt/sda2
-  
+  OUT=/mnt/root
   mkdir -p $OUT/packages
   cp /downloads/os/pi4/packages/*.deb $OUT/packages
   
@@ -218,4 +217,4 @@ main() {
   tweak_root_partition
 }
 
-main
+# main
