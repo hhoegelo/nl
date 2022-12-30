@@ -1,7 +1,7 @@
 FROM docker.io/multiarch/debian-debootstrap:arm64-bullseye-slim
 RUN apt -y update
-RUN apt -y install @PI4_PACKAGES@ zip fuse2fs fdisk wget mc gcc pkg-config libfuse-dev libglib2.0-dev make gdebi
-RUN dpkg -l | grep "^ii" | awk ' {print $2} ' | xargs apt-get -y install --reinstall --download-only
+RUN apt -y install zip fuse2fs fdisk wget mc gcc pkg-config libfuse-dev libglib2.0-dev make
+RUN mkdir -p /packages
 
 RUN mkdir /mnt/rootfs
 RUN mkdir /mnt/bootfs
@@ -22,3 +22,10 @@ ENV RASPI_URL=https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspio
 
 RUN wget -qO- --no-check-certificate $RASPI_URL | xzcat | dd of=/rootfs.img skip=532480 count=3391488
 RUN wget -qO- --no-check-certificate $RASPI_URL | xzcat | dd of=/bootfs.img skip=8192 count=524288
+RUN wget -qO- --no-check-certificate $RASPI_URL | xzcat | dd of=/prefs.img skip=0 count=8192
+
+RUN apt-cache depends --recurse --no-recommends --no-suggests --no-conflicts --no-breaks --no-replaces --no-enhances @PI4_PACKAGES@ | \
+    grep "^\w" | sort -u | grep -v "libacl1" | grep -v "chrony" | \
+    grep -v "libelogind0" | grep -v "^ntp$" | grep -v "ntpsec" | grep -v "openntpd" > /packages.txt
+WORKDIR /packages
+RUN apt-get download $(cat /packages.txt)

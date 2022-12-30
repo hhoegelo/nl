@@ -15,6 +15,7 @@ add_custom_command(
     COMMENT "Build pi4 factory image"
     OUTPUT pi4-factory.img
     DEPENDS ${POD_TARGET}
+    DEPENDS createRootFS.sh
     VERBATIM
     COMMAND podman run 
         --network=none
@@ -24,7 +25,7 @@ add_custom_command(
         --rm 
         -ti
         -v ${CMAKE_CURRENT_BINARY_DIR}:/out 
-        ${POD_URI} /out/createRootFS.sh 
+        ${POD_URI} /out/createRootFS.sh
 )
 
 add_custom_target(pi4-factory-img DEPENDS pi4-factory.img)

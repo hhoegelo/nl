@@ -1,6 +1,5 @@
 #!/bin/bash
 
-set -e
 set -x
 
 tweak_boot_partition() {
@@ -9,11 +8,11 @@ tweak_boot_partition() {
   mv /mnt/bootfs/* /tmp/bootfs/
   OUT=/tmp/bootfs
 
-  [[ "$PI4_Model" =~ "CM4" ]] && mv /boot-files/* $OUT
+  [[ "@PI4_Model@" =~ "CM4" ]] && mv /boot-files/* $OUT
   
   echo -n "console=serial0,115200 "                         >  $OUT/cmdline.txt
   echo -n "console=tty1 "                                   >> $OUT/cmdline.txt
-  echo -n "root=PARTUUID=6c74a671-02 "                      >> $OUT/cmdline.txt
+  echo -n "root=PARTUUID=21e60f8c-02 "                      >> $OUT/cmdline.txt
   echo -n "rootfstype=ext4 "                                >> $OUT/cmdline.txt
   echo -n "fsck.repair=yes "                                >> $OUT/cmdline.txt
   echo -n "rootwait "                                       >> $OUT/cmdline.txt
@@ -29,8 +28,8 @@ tweak_boot_partition() {
   
   echo -n "isolcpus=0,2 "                                   >> $OUT/cmdline.txt
       
-  [[ "$PI4_FEATURES" =~ "NO_CURSOR" ]] && echo -n "vt.global_cursor_default=0 " >> $OUT/cmdline.txt
-  [[ "$PI4_FEATURES" =~ "NO_X" ]] && echo -n "start_x=0 " >> $OUT/config.txt
+  [[ "@PI4_FEATURES@" =~ "NO_CURSOR" ]] && echo -n "vt.global_cursor_default=0 " >> $OUT/cmdline.txt
+  [[ "@PI4_FEATURES@" =~ "NO_X" ]] && echo -n "start_x=0 " >> $OUT/config.txt
   
   touch $OUT/ssh
 
@@ -54,11 +53,13 @@ enable_service() {
 tweak_root_partition() {
   fuse2fs /rootfs.img /mnt/rootfs
   OUT=/mnt/rootfs
-  cp /var/cache/apt/archives/*_all.deb $OUT/var/cache/apt/archives/
-  cp /var/cache/apt/archives/*_arm64.deb $OUT/var/cache/apt/archives/
-  chroot $OUT dpkg -i /var/cache/apt/archives/gdebi*
-  chroot $OUT gdebi /var/cache/apt/archives/*_all.deb 
+
+  rm /packages/busybox-static*
+  cp -R /packages $OUT/
   
+  mount --bind /dev $OUT/dev
+  chroot $OUT dpkg -i /packages/*.deb
+    
   echo "hostname"                       > $OUT/etc/dhcpcd.conf
   echo "clientid"                       >> $OUT/etc/dhcpcd.conf
   echo "persistent"                     >> $OUT/etc/dhcpcd.conf
@@ -67,10 +68,10 @@ tweak_root_partition() {
   echo "require dhcp_server_identifier" >> $OUT/etc/dhcpcd.conf
   echo "slaac private"                  >> $OUT/etc/dhcpcd.conf
   
-  if [[ "$PI4_ETH" =~ "STATIC:" ]]; then
-    IP=$(echo "$PI4_ETH" | cut -d ':' -f2)
-    ROUTERS=$(echo "$PI4_ETH" | cut -d ':' -f3)
-    DNS=$(echo "$PI4_ETH" | cut -d ':' -f4)
+  if [[ "@PI4_ETH@" =~ "STATIC:" ]]; then
+    IP=$(echo "@PI4_ETH@" | cut -d ':' -f2)
+    ROUTERS=$(echo "@PI4_ETH@" | cut -d ':' -f3)
+    DNS=$(echo "@PI4_ETH@" | cut -d ':' -f4)
     
     echo "profile static_eth0"                                                >> $OUT/etc/dhcpcd.conf
     echo "static ip_address=$IP"                                              >> $OUT/etc/dhcpcd.conf
@@ -79,15 +80,15 @@ tweak_root_partition() {
     echo ""                                                                   >> $OUT/etc/dhcpcd.conf
     echo "interface eth0"                                                     >> $OUT/etc/dhcpcd.conf
     echo "fallback static_eth0"                                               >> $OUT/etc/dhcpcd.conf
-  elif [ "$PI4_ETH" = "DHCP" ]; then
+  elif [ "@PI4_ETH@" = "DHCP" ]; then
     echo "option domain_name_servers, domain_name, domain_search, host_name"  >> $OUT/etc/dhcpcd.conf
     echo "option classless_static_routes"                                     >> $OUT/etc/dhcpcd.conf
   fi
   
-  if [[ "$PI4_WIFI" =~ "STATIC:" ]]; then
-    IP=$(echo "$PI4_WIFI" | cut -d ':' -f2)
-    ROUTERS=$(echo "$PI4_WIFI" | cut -d ':' -f3)
-    DNS=$(echo "$PI4_WIFI" | cut -d ':' -f4)
+  if [[ "@PI4_WIFI@" =~ "STATIC:" ]]; then
+    IP=$(echo "@PI4_WIFI@" | cut -d ':' -f2)
+    ROUTERS=$(echo "@PI4_WIFI@" | cut -d ':' -f3)
+    DNS=$(echo "@PI4_WIFI@" | cut -d ':' -f4)
     
     echo "profile static_wifi"              >> $OUT/etc/dhcpcd.conf
     echo "static ip_address=$IP"            >> $OUT/etc/dhcpcd.conf
@@ -96,9 +97,9 @@ tweak_root_partition() {
     echo ""                                 >> $OUT/etc/dhcpcd.conf
     echo "interface wlan0"                  >> $OUT/etc/dhcpcd.conf
     echo "fallback static_wifi"             >> $OUT/etc/dhcpcd.conf
-  elif [[ "$PI4_WIFI" =~ "CLIENT:" ]]; then
-    SSID=$(echo "$PI4_WIFI" | cut -d ':' -f2)
-    PSK=$(echo "$PI4_WIFI" | cut -d ':' -f3)
+  elif [[ "@PI4_WIFI@" =~ "CLIENT:" ]]; then
+    SSID=$(echo "@PI4_WIFI@" | cut -d ':' -f2)
+    PSK=$(echo "@PI4_WIFI@" | cut -d ':' -f3)
     echo "ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev"  > $OUT/etc/wpa_supplicant/wpa_supplicant.conf
     echo "update_config=1"                                          >> $OUT/etc/wpa_supplicant/wpa_supplicant.conf
     echo "country=DE"                                               >> $OUT/etc/wpa_supplicant/wpa_supplicant.conf
@@ -106,9 +107,9 @@ tweak_root_partition() {
     echo "  ssid=\"$SSID\""                                         >> $OUT/etc/wpa_supplicant/wpa_supplicant.conf
     echo "  psk=\"$PSK\""                                           >> $OUT/etc/wpa_supplicant/wpa_supplicant.conf
     echo "}"                                                        >> $OUT/etc/wpa_supplicant/wpa_supplicant.conf
-  elif [[ "$PI4_WIFI" =~ "AP:" ]]; then
-    SSID=$(echo "$PI4_WIFI" | cut -d ':' -f2)
-    PHRASE=$(echo "$PI4_WIFI" | cut -d ':' -f3)
+  elif [[ "@PI4_WIFI@" =~ "AP:" ]]; then
+    SSID=$(echo "@PI4_WIFI@" | cut -d ':' -f2)
+    PHRASE=$(echo "@PI4_WIFI@" | cut -d ':' -f3)
     echo "interface=wlan0"        > $OUT/etc/hostapd/hostapd.conf
     echo "ssid=$SSID"             >> $OUT/etc/hostapd/hostapd.conf
     echo "hw_mode=g"              >> $OUT/etc/hostapd/hostapd.conf
@@ -146,19 +147,19 @@ tweak_root_partition() {
     sed "s/eth0/wlan0/g" -i $OUT/etc/udhcpd.conf
   fi
   
-  if [[ "$PI4_FEATURES" =~ "LCD_PWM" ]]; then
+  if [[ "@PI4_FEATURES@" =~ "LCD_PWM" ]]; then
     cp /root-files/configure-lcd-pwm.sh /usr/bin/configure-lcd-pwm.sh
     cp /root-files/configure-lcd-pwm.service $OUT/usr/lib/systemd/system/
     enable_service configure-lcd-pwm.service
   fi
   
-  if [[ "$PI4_FEATURES" =~ "NEOPIXEL_SPI" ]]; then
+  if [[ "@PI4_FEATURES@" =~ "NEOPIXEL_SPI" ]]; then
     cp /root-files/configure-neopixel-spi.sh /usr/bin/configure-lcd-pwm.sh
     cp /root-files/configure-neopixel-spi.service $OUT/usr/lib/systemd/system/
     enable_service configure-neopixel-spi.service
   fi
   
-  if [[ "$PI4_FEATURES" =~ "MAX_CPU" ]]; then
+  if [[ "@PI4_FEATURES@" =~ "MAX_CPU" ]]; then
     cp /root-files/max-cpu.service $OUT/usr/lib/systemd/system/
     enable_service max-cpu.service 
   fi
@@ -191,6 +192,10 @@ tweak_root_partition() {
 main() {
   tweak_root_partition
   tweak_boot_partition
+  truncate -s 2009071616 /out/pi4-factory.img
+  dd if=/prefs.img of=/out/pi4-factory.img seek=0 count=8192
+  dd if=/bootfs.img of=/out/pi4-factory.img seek=8192 count=524288
+  dd if=/rootfs.img of=/out/pi4-factory.img seek=532480 count=3391488
 }
 
 main
