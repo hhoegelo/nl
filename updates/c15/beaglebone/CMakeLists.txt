@@ -1,4 +1,6 @@
 SET(TARGET_MACHINE beaglebone)
 
-crossBuild(update-c15-beaglebone nltools midi-over-ip bridge[nltools] playcontroller-tools)
+crossBuild(
+    NAME update-c15-beaglebone 
+    DEPENDS nltools midi-over-ip bridge[nltools] playcontroller-tools)
 

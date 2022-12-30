@@ -52,13 +52,15 @@ function(registerPod)
   endif()
 endfunction()
 
-function(crossBuild NAME)
-  MESSAGE("crossBuild: ${NAME}")
+function(crossBuild)
+  cmake_parse_arguments(CROSS_BUILD "" "NAME" "DEPENDS" ${ARGN} )
+
+  MESSAGE("crossBuild: ${CROSS_BUILD_NAME}")
 
   file(READ ${CMAKE_BINARY_DIR}/build-environments/${TARGET_MACHINE}/pod-checksum DOCKERFILE_SHA1)
 
   # commands for cross building all the desired packages
-  foreach(PACKAGE ${ARGN})
+  foreach(PACKAGE ${CROSS_BUILD_DEPENDS})
 
     message("Processing package ${PACKAGE}")
 
@@ -170,11 +172,11 @@ function(crossBuild NAME)
   list(TRANSFORM DEPENDENCIES PREPEND ${CMAKE_CURRENT_BINARY_DIR}/)
 
   add_custom_command(
-    COMMENT "Build ${NAME}"
+    COMMENT "Build ${CROSS_BUILD_NAME}"
     DEPENDS ${DEPENDENCIES}
-    OUTPUT ${NAME}.tar.gz
-    COMMAND tar -czf ${NAME}.tar.gz -C ${CMAKE_CURRENT_BINARY_DIR} ${DEPENDENCIES_FILES}
+    OUTPUT ${CROSS_BUILD_NAME}.tar.gz
+    COMMAND tar -czf ${CROSS_BUILD_NAME}.tar.gz -C ${CMAKE_CURRENT_BINARY_DIR} ${DEPENDENCIES_FILES}
   )
 
-  add_custom_target(${NAME} DEPENDS ${NAME}.tar.gz)
+  add_custom_target(${CROSS_BUILD_NAME} DEPENDS ${CROSS_BUILD_NAME}.tar.gz)
 endfunction()

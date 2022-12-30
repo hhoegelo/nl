@@ -4,8 +4,11 @@ set -e
 set -x
 
 tweak_boot_partition() {
-  OUT=/mnt/boot
-    
+  fusefat /bootfs.img /mnt/bootfs -o rw+
+  mkdir /tmp/bootfs
+  mv /mnt/bootfs/* /tmp/bootfs/
+  OUT=/tmp/bootfs
+
   [[ "$PI4_Model" =~ "CM4" ]] && mv /boot-files/* $OUT
   
   echo -n "console=serial0,115200 "                         >  $OUT/cmdline.txt
@@ -30,58 +33,31 @@ tweak_boot_partition() {
   [[ "$PI4_FEATURES" =~ "NO_X" ]] && echo -n "start_x=0 " >> $OUT/config.txt
   
   touch $OUT/ssh
+
+  mv /tmp/bootfs/* /mnt/bootfs/
+  sync 
+  umount /mnt/bootfs
 }
 
 disable_service() {
-  OUT=/mnt/root
   NAME="$1"
   chroot $OUT rm -f /etc/systemd/system/multi-user.target.wants/$NAME
   chroot $OUT ln -s /dev/null /etc/systemd/system/multi-user.target.wants/$NAME 
 }
 
 enable_service() {
-  OUT=/mnt/root
   NAME="$1"
   chroot $OUT rm -f /etc/systemd/system/multi-user.target.wants/$NAME
   chroot $OUT ln -s /usr/lib/systemd/system/$NAME /etc/systemd/system/multi-user.target.wants/$NAME 
 }
 
 tweak_root_partition() {
-  OUT=/mnt/root
-  mkdir -p $OUT/packages
-  cp /downloads/os/pi4/packages/*.deb $OUT/packages
-  
-  PACKAGEFILES=$(cat /pi4-binary-dir/collect-packages/package-files.txt | while read -r FILE; do 
-    FILE=$(echo $FILE | sed 's/%/%25/')
-    [ "$FILE" != "" ] && echo -n "/packages/$FILE "
-  done)
-  
-  # filter out already installed packages
-  while read -r ALREADY; do
-    P=$(echo $ALREADY | cut -d' ' -f2 | sed 's/\:armhf//g')
-    V=$(echo $ALREADY | cut -d' ' -f3 | sed 's/\:/%3a/g' | sed 's/%/%25/g')
-    V2=$(echo $ALREADY | cut -d' ' -f3 | sed 's/\:/%3a/g' | sed 's/\+[^ ]*//g' | sed 's/%/%25/g')
-    A=$(echo $ALREADY | cut -d' ' -f4)
-    F1=$(printf "/packages/%s_%s_%s.deb" $P $V $A)
-    F2=$(printf "/packages/%s_%s[^ ]*_%s.deb" $P $V $A)
-    F3=$(printf "/packages/%s_%s[^ ]*_%s.deb" $P $V2 $A)
-    PACKAGEFILES=$(echo $PACKAGEFILES | sed "s|$F1||g" | sed "s|$F2||g" | sed "s|$F3||g")
-  done <<< $(chroot $OUT dpkg -l | grep "^ii" | sed 's/[ ]* / /g')
-
-  echo "Now installing packages: $PACKAGEFILES"
-
-  FIXED_PACKAGFILES="";
-
-  for p in $PACKAGEFILES; do
-    if [ ! -f $p ]; then
-        c=$(echo $p | sed 's/%25/%/g')
-        FIXED_PACKAGFILES="$FIXED_PACKAGFILES $c"
-    else
-        FIXED_PACKAGFILES="$FIXED_PACKAGFILES $p"
-    fi
-  done
-
-  chroot $OUT dpkg -i $FIXED_PACKAGFILES
+  fuse2fs /rootfs.img /mnt/rootfs
+  OUT=/mnt/rootfs
+  cp /var/cache/apt/archives/*_all.deb $OUT/var/cache/apt/archives/
+  cp /var/cache/apt/archives/*_arm64.deb $OUT/var/cache/apt/archives/
+  chroot $OUT dpkg -i /var/cache/apt/archives/gdebi*
+  chroot $OUT gdebi /var/cache/apt/archives/*_all.deb 
   
   echo "hostname"                       > $OUT/etc/dhcpcd.conf
   echo "clientid"                       >> $OUT/etc/dhcpcd.conf
@@ -213,8 +189,8 @@ tweak_root_partition() {
 }
 
 main() {
-  tweak_boot_partition
   tweak_root_partition
+  tweak_boot_partition
 }
 
-# main
+main

@@ -17,6 +17,7 @@ add_custom_command(
     DEPENDS ${POD_TARGET}
     VERBATIM
     COMMAND podman run 
+        --network=none
         --authfile=${CMAKE_BINARY_DIR}/podman-authentication 
         --tls-verify=false
         --privileged 
