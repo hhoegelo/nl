@@ -7,7 +7,7 @@
 #include <vector>
 #include <cstdint>
 
-#ifdef __arm__
+#if defined(__arm__) || defined(__aarch64__)
 
 #include <arm_neon.h>
 
@@ -40,8 +40,7 @@ namespace parallel_data_detail
 
   template <size_t simdSize, size_t parallelism> struct Copy
   {
-#ifdef __arm__
-
+#if defined(__arm__) || defined(__aarch64__)
     static void copy(v128<int32_t, simdSize, parallelism> &out, const v128<float, simdSize, parallelism> &in)
     {
       for(int i = 0; i < simdSize; i++)
@@ -183,8 +182,7 @@ template <typename T, size_t size> class ParallelData
     return l;                                                                                                          \
   }
 
-#ifdef __arm__
-
+#if defined(__arm__) || defined(__aarch64__)
 #define VECTOR_P_S_CMP_OPERATOR(operation, imm)                                                                        \
   template <typename T, size_t size>                                                                                   \
   inline ParallelData<uint32_t, size> operator operation(const ParallelData<T, size> &l, T r)                          \
@@ -263,8 +261,7 @@ namespace std
     return in & ParallelData<uint32_t, size>(0x7FFFFFFF);  // masking sign bit
   }
 
-#ifdef __arm__
-
+#if defined(__arm__) || defined(__aarch64__)
   template <size_t size> inline ParallelData<float, size> min(const ParallelData<float, size> &in, float a)
   {
     ParallelData<float, size> ret;

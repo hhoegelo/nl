@@ -1,0 +1,16 @@
+FROM debian:bullseye-slim
+
+ENV LANG en_US.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update -y
+RUN apt-get install -y git cmake build-essential pkg-config gcc-aarch64-linux-gnu g++-aarch64-linux-gnu binutils-aarch64-linux-gnu
+
+RUN dpkg --add-architecture arm64
+RUN apt-get update -y
+RUN apt-get install -y libsoup2.4-dev:arm64 libflac-dev:arm64 libglibmm-2.4-dev:arm64 libasound2-dev:arm64 libboost-dev:arm64 \
+    libfreetype-dev:arm64 libpng++-dev
+RUN apt -y install debhelper dh-make quilt fakeroot lintian sudo
+
+ENV CMAKE_GENERATOR="Unix Makefiles"
+ENV PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig

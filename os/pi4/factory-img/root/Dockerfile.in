@@ -4,25 +4,12 @@ RUN apt -y install zip fuse2fs fdisk wget mc gcc pkg-config libfuse-dev libglib2
 RUN mkdir -p /packages
 
 RUN mkdir /mnt/rootfs
-RUN mkdir /mnt/bootfs
-
-# fetch build and install fusefat
-WORKDIR /
-RUN wget http://downloads.sourceforge.net/project/libfat/libfat/0.3a/libfat-0.3a.tar.gz
-RUN gzip -d /libfat-0.3a.tar.gz 
-RUN tar xf /libfat-0.3a.tar 
-WORKDIR /fuse-umfuse-fat-0.1
-RUN ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --build=aarch64-unknown-linux-gnu
-RUN make fusefat
-RUN make install
 
 # fetch original raspi partitions
 WORKDIR /
 ENV RASPI_URL=https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-09-26/2022-09-22-raspios-bullseye-arm64-lite.img.xz
 
 RUN wget -qO- --no-check-certificate $RASPI_URL | xzcat | dd of=/rootfs.img skip=532480 count=3391488
-RUN wget -qO- --no-check-certificate $RASPI_URL | xzcat | dd of=/bootfs.img skip=8192 count=524288
-RUN wget -qO- --no-check-certificate $RASPI_URL | xzcat | dd of=/prefs.img skip=0 count=8192
 
 RUN apt-cache depends --recurse --no-recommends --no-suggests --no-conflicts --no-breaks --no-replaces --no-enhances @PI4_PACKAGES@ | \
     grep "^\w" | sort -u | grep -v "libacl1" | grep -v "chrony" | \

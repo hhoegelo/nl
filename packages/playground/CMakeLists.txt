@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.18.4)
 include(${CMAKE_BINARY_DIR}/cmake/ccache.cmake)
 
 ######################################################
@@ -21,6 +21,7 @@ endif()
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBS REQUIRED glibmm-2.4 giomm-2.4 gio-unix-2.0 freetype2 uuid libpng libsoup-2.4)
 
+
 include(GNUInstallDirs)
 
 configure_file(src/CompileTimeOptions.h.in src/CompileTimeOptions.h)
@@ -37,6 +38,10 @@ add_library(${PROJECT_NAME}
   src/BuildVersion.cpp
   ${CMAKE_BINARY_DIR}/shared/playcontroller/EHC-pedal-presets.c
   )
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(${LIBNAME} PRIVATE Threads::Threads)
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 

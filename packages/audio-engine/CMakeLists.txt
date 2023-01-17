@@ -1,12 +1,8 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.18.4)
 project(audio-engine VERSION 1.0.1)
 
 SET(RECORDER_WEBSOCKET_PORT 8889)
 SET(RECORDER_HTTPSERVER_PORT 8890)
-
-if(NOT ARCHITECTURE)
-  SET(ARCHITECTURE native)
-endif()
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenMP REQUIRED)
@@ -17,9 +13,12 @@ file(GLOB_RECURSE SOURCE_FILES ./src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
+
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
-target_compile_options(${PROJECT_NAME} PRIVATE -march=${ARCHITECTURE})
 target_compile_options(${PROJECT_NAME} PRIVATE ${OpenMP_CXX_FLAGS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE RECORDER_WEBSOCKET_PORT=${RECORDER_WEBSOCKET_PORT} RECORDER_HTTPSERVER_PORT=${RECORDER_HTTPSERVER_PORT})

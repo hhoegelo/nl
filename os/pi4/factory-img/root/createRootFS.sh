@@ -2,42 +2,6 @@
 
 set -x
 
-tweak_boot_partition() {
-  fusefat /bootfs.img /mnt/bootfs -o rw+
-  mkdir /tmp/bootfs
-  mv /mnt/bootfs/* /tmp/bootfs/
-  OUT=/tmp/bootfs
-
-  [[ "@PI4_Model@" =~ "CM4" ]] && mv /boot-files/* $OUT
-  
-  echo -n "console=serial0,115200 "                         >  $OUT/cmdline.txt
-  echo -n "console=tty1 "                                   >> $OUT/cmdline.txt
-  echo -n "root=PARTUUID=21e60f8c-02 "                      >> $OUT/cmdline.txt
-  echo -n "rootfstype=ext4 "                                >> $OUT/cmdline.txt
-  echo -n "fsck.repair=yes "                                >> $OUT/cmdline.txt
-  echo -n "rootwait "                                       >> $OUT/cmdline.txt
-  echo -n "quiet "                                          >> $OUT/cmdline.txt
-  echo -n "splash "                                         >> $OUT/cmdline.txt
-  echo -n "fsck.mode=skip "                                 >> $OUT/cmdline.txt
-  echo -n "noswap "                                         >> $OUT/cmdline.txt
-  echo -n "systemd.restore_state=0 rfkill.default_state=1 " >> $OUT/cmdline.txt
-  
-  echo -n "elevator=deadline "                              >> $OUT/cmdline.txt
-  echo -n "fastboot "                                       >> $OUT/cmdline.txt
-  echo -n "logo.nologo "                                    >> $OUT/cmdline.txt
-  
-  echo -n "isolcpus=0,2 "                                   >> $OUT/cmdline.txt
-      
-  [[ "@PI4_FEATURES@" =~ "NO_CURSOR" ]] && echo -n "vt.global_cursor_default=0 " >> $OUT/cmdline.txt
-  [[ "@PI4_FEATURES@" =~ "NO_X" ]] && echo -n "start_x=0 " >> $OUT/config.txt
-  
-  touch $OUT/ssh
-
-  mv /tmp/bootfs/* /mnt/bootfs/
-  sync 
-  umount /mnt/bootfs
-}
-
 disable_service() {
   NAME="$1"
   chroot $OUT rm -f /etc/systemd/system/multi-user.target.wants/$NAME
@@ -51,14 +15,14 @@ enable_service() {
 }
 
 tweak_root_partition() {
-  fuse2fs /rootfs.img /mnt/rootfs
   OUT=/mnt/rootfs
+  fuse2fs /rootfs.img $OUT
 
   rm /packages/busybox-static*
   cp -R /packages $OUT/
   
   mount --bind /dev $OUT/dev
-  chroot $OUT dpkg -i /packages/*.deb
+  chroot $OUT dpkg -i -G /packages/*.deb
     
   echo "hostname"                       > $OUT/etc/dhcpcd.conf
   echo "clientid"                       >> $OUT/etc/dhcpcd.conf
@@ -148,23 +112,23 @@ tweak_root_partition() {
   fi
   
   if [[ "@PI4_FEATURES@" =~ "LCD_PWM" ]]; then
-    cp /root-files/configure-lcd-pwm.sh /usr/bin/configure-lcd-pwm.sh
-    cp /root-files/configure-lcd-pwm.service $OUT/usr/lib/systemd/system/
+    cp /out/configure-lcd-pwm.sh /usr/bin/configure-lcd-pwm.sh
+    cp /out/configure-lcd-pwm.service $OUT/usr/lib/systemd/system/
     enable_service configure-lcd-pwm.service
   fi
   
   if [[ "@PI4_FEATURES@" =~ "NEOPIXEL_SPI" ]]; then
-    cp /root-files/configure-neopixel-spi.sh /usr/bin/configure-lcd-pwm.sh
-    cp /root-files/configure-neopixel-spi.service $OUT/usr/lib/systemd/system/
+    cp /out/configure-neopixel-spi.sh /usr/bin/configure-lcd-pwm.sh
+    cp /out/configure-neopixel-spi.service $OUT/usr/lib/systemd/system/
     enable_service configure-neopixel-spi.service
   fi
   
   if [[ "@PI4_FEATURES@" =~ "MAX_CPU" ]]; then
-    cp /root-files/max-cpu.service $OUT/usr/lib/systemd/system/
+    cp /out/max-cpu.service $OUT/usr/lib/systemd/system/
     enable_service max-cpu.service 
   fi
   
-  cp /root-files/backlight.sh $OUT/usr/bin/
+  cp /out/backlight.sh $OUT/usr/bin/
     
   disable_service dphys-swapfile.service
   disable_service cpufrequtils.service
@@ -183,19 +147,17 @@ tweak_root_partition() {
   chroot $OUT /bin/sh -c "DEBIAN_FRONTEND=noninteractive apt -y remove build-essential g++ g++-10 gcc emacsen-common gdb vlc sound-theme-freedesktop pulseaudio"
   chroot $OUT /bin/sh -c "DEBIAN_FRONTEND=noninteractive apt -y autoremove"
   
-  rm $OUT/etc/xdg/autostart/piwiz.desktop
-  rm $OUT/etc/xdg/autostart/pulseaudio.desktop
-  rm $OUT/etc/xdg/autostart/pprompt.desktop
-  rm $OUT/etc/xdg/autostart/print-applet.desktop
+  rm -rf $OUT/etc/xdg/autostart/piwiz.desktop
+  rm -rf $OUT/etc/xdg/autostart/pulseaudio.desktop
+  rm -rf $OUT/etc/xdg/autostart/pprompt.desktop
+  rm -rf $OUT/etc/xdg/autostart/print-applet.desktop
+
+  umount $OUT
 }
 
 main() {
   tweak_root_partition
-  tweak_boot_partition
-  truncate -s 2009071616 /out/pi4-factory.img
-  dd if=/prefs.img of=/out/pi4-factory.img seek=0 count=8192
-  dd if=/bootfs.img of=/out/pi4-factory.img seek=8192 count=524288
-  dd if=/rootfs.img of=/out/pi4-factory.img seek=532480 count=3391488
+  cp /rootfs.img /out/pi4-rootfs.img
 }
 
 main

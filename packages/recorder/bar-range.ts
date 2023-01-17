@@ -22,6 +22,7 @@ class BarRange {
         return Math.min(Math.max(this.one, this.other), this.c15.getBars().last().id);
     }
 
+
     empty(): boolean {
         return this.one == this.other;
     }
