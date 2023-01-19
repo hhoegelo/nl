@@ -6,6 +6,9 @@ add_custom_command(
     COMMENT "Build pi4 factory image"
     OUTPUT pi4-factory.img
     DEPENDS pi4-rootfs pi4-bootfs pi4-prefs
+    DEPENDS pre/pi4-prefs.img
+    DEPENDS root/pi4-rootfs.img
+    DEPENDS boot/pi4-bootfs.img
     VERBATIM
     COMMAND truncate -s 2009071616 ${CMAKE_CURRENT_BINARY_DIR}/pi4-factory.img
     COMMAND dd if=${CMAKE_CURRENT_BINARY_DIR}/pre/pi4-prefs.img of=${CMAKE_CURRENT_BINARY_DIR}/pi4-factory.img seek=0 count=8192

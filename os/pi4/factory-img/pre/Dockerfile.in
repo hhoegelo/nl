@@ -1,6 +1,6 @@
 FROM docker.io/multiarch/debian-debootstrap:arm64-bullseye-slim
 RUN apt -y update
-RUN apt -y install zip wget 
+RUN apt -y install zip wget xz-utils
 
 ENV RASPI_URL=https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-09-26/2022-09-22-raspios-bullseye-arm64-lite.img.xz
 RUN wget -qO- --no-check-certificate $RASPI_URL | xzcat | dd of=/prefs.img skip=0 count=8192

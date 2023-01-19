@@ -133,6 +133,7 @@ tweak_root_partition() {
   disable_service dphys-swapfile.service
   disable_service cpufrequtils.service
   disable_service loadcpufreq.service
+  disable_service userconfig.service
 
   echo "cpufreq-set -g performance" >> $OUT/etc/rc.local
  

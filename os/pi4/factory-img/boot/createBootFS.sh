@@ -18,9 +18,9 @@ write-append /cmdline.txt "fastboot "
 write-append /cmdline.txt "logo.nologo "
 write-append /cmdline.txt "isolcpus=0,2 "
 
-# [[ "@PI4_Model@" =~ "CM4" ]] && mv /boot-files/* $OUT
-# [[ "@PI4_FEATURES@" =~ "NO_CURSOR" ]] && echo -n "vt.global_cursor_default=0 " >> /cmdline.txt
-# [[ "@PI4_FEATURES@" =~ "NO_X" ]] && echo -n "start_x=0 " >> /config.txt
+@PI4_BOOT_FS_COPY_FILES@
+@PI4_BOOT_FS_NO_CURSOR@
+@PI4_BOOT_FS_NO_X@
   
 touch /ssh
 umount /

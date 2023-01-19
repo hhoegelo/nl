@@ -6,6 +6,22 @@ foreach(file ${BOOT_FILES})
     configure_file(${file} ${file} COPYONLY)
 endforeach()
 
+if(${PI4_Model} MATCHES "CM4")
+    SET(PI4_BOOT_FS_COPY_FILES "copy-in")
+    foreach(file ${BOOT_FILES})
+        SET(PI4_BOOT_FS_COPY_FILES "${PI4_BOOT_FS_COPY_FILES} /out/${file}")
+    endforeach()
+    SET(PI4_BOOT_FS_COPY_FILES "${PI4_BOOT_FS_COPY_FILES} /")
+endif()
+
+if(${PI4_FEATURES} MATCHES ".*NO_CURSOR.*")
+    SET(PI4_BOOT_FS_NO_CURSOR "write-append /cmdline.txt 'vt.global_cursor_default=0 '")
+endif()
+
+if(${PI4_FEATURES} MATCHES ".*NO_X.*")
+    SET(PI4_BOOT_FS_NO_X "write-append /config.txt 'start_x=0  '")
+endif()
+
 foreach(file createBootFS.sh)
     configure_file(${file} ${file} @ONLY)
 endforeach()
@@ -14,7 +30,7 @@ add_custom_command(
     COMMENT "Build pi4 boot partition"
     OUTPUT pi4-bootfs.img
     DEPENDS ${POD_TARGET}
-    DEPENDS createBootFS.sh
+    DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/createBootFS.sh
     VERBATIM
     COMMAND 
         cat ${CMAKE_CURRENT_BINARY_DIR}/createBootFS.sh | 
