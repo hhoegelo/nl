@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -x
+set -e
 
 disable_service() {
   NAME="$1"
@@ -19,10 +20,18 @@ tweak_root_partition() {
   fuse2fs /rootfs.img $OUT
 
   rm /packages/busybox-static*
-  cp -R /packages $OUT/
-  
+  mkdir $OUT/packages
+  mount --bind /packages $OUT/packages
   mount --bind /dev $OUT/dev
-  chroot $OUT dpkg -i -G /packages/*.deb
+
+  chroot $OUT dpkg -i -G -E \
+    --path-exclude /usr/share/doc/\* \
+    --path-exclude /usr/share/man/\* \
+    --path-exclude /usr/share/groff/\* \
+    --path-exclude /usr/share/info/\* \
+    --path-exclude /usr/share/lintian/\* \
+    --path-exclude /usr/share/linda/\* \
+    /packages/*.deb
     
   echo "hostname"                       > $OUT/etc/dhcpcd.conf
   echo "clientid"                       >> $OUT/etc/dhcpcd.conf

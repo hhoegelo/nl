@@ -17,7 +17,7 @@ add_custom_command(
     DEPENDS createRootFS.sh
     VERBATIM
     COMMAND podman run 
-        --network=none
+        #--network=none
         --authfile=${CMAKE_BINARY_DIR}/podman-authentication 
         --tls-verify=false
         --privileged 
