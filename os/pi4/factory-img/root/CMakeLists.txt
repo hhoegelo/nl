@@ -1,7 +1,5 @@
 set(ROOT_FILES backlight.sh configure-lcd-pwm.service configure-lcd-pwm.sh configure-neopixel-spi.service configure-neopixel-spi.sh max-cpu.service)
 
-registerPod(USED_VARIABLES ${PI4_PACKAGES})
-
 foreach(file ${ROOT_FILES})
     configure_file(${file} ${file} COPYONLY)
 endforeach()
@@ -10,6 +8,10 @@ foreach(file createRootFS.sh)
     configure_file(${file} ${file} @ONLY)
 endforeach()
 
+registerPod(
+    TWEAK_IMAGE tweakImage.sh
+    USED_VARIABLES ${PI4_PACKAGES} ${PI4_FACTORY_BASE_IMAGE} ${PI4_FACTORY_BASE_IMAGE_ROOT_FS_POSITION} ${PI4_FACTORY_BASE_IMAGE_ROOT_FS_SIZE})
+
 add_custom_command(
     COMMENT "Build pi4 rootfs"
     OUTPUT pi4-rootfs.img
@@ -17,7 +19,7 @@ add_custom_command(
     DEPENDS createRootFS.sh
     VERBATIM
     COMMAND podman run 
-        #--network=none
+        --network=none
         --authfile=${CMAKE_BINARY_DIR}/podman-authentication 
         --tls-verify=false
         --privileged 

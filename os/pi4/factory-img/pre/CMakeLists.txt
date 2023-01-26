@@ -1,5 +1,5 @@
 
-registerPod()
+registerPod(USED_VARIABLES ${PI4_FACTORY_BASE_IMAGE} ${PI4_FACTORY_BASE_IMAGE_PRE_FS_POSITION} ${PI4_FACTORY_BASE_IMAGE_PRE_FS_SIZE})
 
 add_custom_command(
     COMMENT "Build pi4 prefs"

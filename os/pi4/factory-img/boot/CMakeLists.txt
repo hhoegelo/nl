@@ -1,6 +1,6 @@
 set(BOOT_FILES config.txt touch.dtbo touch.dts)
 
-registerPod()
+registerPod(USED_VARIABLES ${PI4_FACTORY_BASE_IMAGE} ${PI4_FACTORY_BASE_IMAGE_BOOT_FS_POSITION} ${PI4_FACTORY_BASE_IMAGE_BOOT_FS_SIZE})
 
 foreach(file ${BOOT_FILES})
     configure_file(${file} ${file} COPYONLY)

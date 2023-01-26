@@ -1,8 +1,5 @@
 FROM docker.io/jurajama/guestfish
 
-# fetch original raspi partitions
 WORKDIR /
-ENV RASPI_URL=https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-09-26/2022-09-22-raspios-bullseye-arm64-lite.img.xz
-
 RUN yum -y install wget
-RUN wget -qO- --no-check-certificate $RASPI_URL | xzcat | dd of=/bootfs.img skip=8192 count=524288
+RUN wget -qO- --no-check-certificate @PI4_FACTORY_BASE_IMAGE@ | xzcat | dd of=/bootfs.img skip=@PI4_FACTORY_BASE_IMAGE_ROOT_FS_POSITION@ count=@PI4_FACTORY_BASE_IMAGE_BOOT_FS_SIZE@

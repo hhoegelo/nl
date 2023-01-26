@@ -1,18 +1,12 @@
-FROM docker.io/multiarch/debian-debootstrap:arm64-bullseye-slim
+FROM docker.io/debian:bullseye-slim
 RUN apt -y update
-RUN apt -y install zip fuse2fs fdisk wget mc gcc pkg-config libfuse-dev libglib2.0-dev make
+RUN apt -y install zip fuse2fs wget mc
 RUN mkdir -p /packages
 
 RUN mkdir /mnt/rootfs
 
-# fetch original raspi partitions
 WORKDIR /
-ENV RASPI_URL=https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2022-09-26/2022-09-22-raspios-bullseye-arm64-lite.img.xz
 
-RUN wget -qO- --no-check-certificate $RASPI_URL | xzcat | dd of=/rootfs.img skip=532480 count=3391488
-
-RUN apt-cache depends --recurse --no-recommends --no-suggests --no-conflicts --no-breaks --no-replaces --no-enhances @PI4_PACKAGES@ | \
-    grep "^\w" | sort -u | grep -v "libacl1" | grep -v "chrony" | \
-    grep -v "libelogind0" | grep -v "^ntp$" | grep -v "ntpsec" | grep -v "openntpd" > /packages.txt
-WORKDIR /packages
-RUN apt-get download $(cat /packages.txt)
+RUN wget -qO- --no-check-certificate @PI4_FACTORY_BASE_IMAGE@ | \
+    xzcat | \
+    dd of=/rootfs.img skip=@PI4_FACTORY_BASE_IMAGE_ROOT_FS_POSITION@ count=@PI4_FACTORY_BASE_IMAGE_ROOT_FS_SIZE@

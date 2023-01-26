@@ -2,6 +2,8 @@
 
 set -e
 set -x
+echo "do we need to run podman here at all???"
+TWEAK="$1"
 
 AUTH=@CMAKE_BINARY_DIR@/podman-authentication
 A=$(jq -r ".auths.\"@PODMAN_REGISTRY@\".auth" $AUTH || echo "")
@@ -13,7 +15,7 @@ if [ "@DEVELOPER_ROLE@" = "developer" ]; then
         podman login --tls-verify=false --authfile=$AUTH --username $ANON --password $ANON @PODMAN_REGISTRY@
     fi
 
-    if ! podman run --tls-verify=false --authfile=$AUTH --rm @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@; then
+    if ! podman image exists @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@; then
         echo "*******************************************************"
         echo "*******************************************************"
         echo "*******************************************************"
@@ -33,11 +35,17 @@ if [ "@DEVELOPER_ROLE@" = "pod-maintainer" ]; then
         podman login --tls-verify=false --authfile=$AUTH --username "nonlinearlabs" --password "@PODMAN_REGISTRY_PASSWORD@" @PODMAN_REGISTRY@
     fi
 
-    if ! podman run --tls-verify=false --authfile=$AUTH --rm @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@; then
-        podman build -t @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@ .
-        podman run --tls-verify=false --authfile=$AUTH --rm @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@
+    if ! podman image exists @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@; then
+        if [ -f $TWEAK ]; then
+            podman container rm intermediate-@DOCKERFILE_SHA1@ || true
+            podman build -t @PODMAN_REGISTRY@/intermediate:@DOCKERFILE_SHA1@ .
+            podman run -ti --privileged -v $TWEAK:/tweak.sh --name intermediate-@DOCKERFILE_SHA1@ --tls-verify=false --authfile=$AUTH @PODMAN_REGISTRY@/intermediate:@DOCKERFILE_SHA1@ /tweak.sh
+            podman commit --include-volumes intermediate-@DOCKERFILE_SHA1@ @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@
+            podman container rm intermediate-@DOCKERFILE_SHA1@
+        else
+            podman build -t @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@ .
+            podman push --tls-verify=false --authfile=$AUTH generic:@DOCKERFILE_SHA1@ @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@        
+        fi
     fi
-   echo "WARNING!!!"
-   #  podman push --tls-verify=false --authfile=$AUTH generic:@DOCKERFILE_SHA1@ @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@        
 fi
 
