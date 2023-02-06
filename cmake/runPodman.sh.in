@@ -2,7 +2,7 @@
 
 set -e
 set -x
-echo "do we need to run podman here at all???"
+
 TWEAK="$1"
 
 AUTH=@CMAKE_BINARY_DIR@/podman-authentication
