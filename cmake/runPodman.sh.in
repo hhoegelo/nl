@@ -1,7 +1,6 @@
 #!/bin/sh
 
 set -e
-set -x
 
 TWEAK="$1"
 
@@ -30,6 +29,19 @@ if [ "@DEVELOPER_ROLE@" = "developer" ]; then
     fi
 fi
 
+function wait_for_tweak_and_commit() {
+    echo "waiting for tweak to finish"
+    
+    while ! podman exec intermediate-@DOCKERFILE_SHA1@ test -e /done; do 
+        sleep 1; 
+    done
+
+    echo "tweak finished."
+
+    podman commit --include-volumes intermediate-@DOCKERFILE_SHA1@ @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@
+    podman exec intermediate-@DOCKERFILE_SHA1@ touch /commited
+}
+
 if [ "@DEVELOPER_ROLE@" = "pod-maintainer" ]; then
     if ! echo "$A" | base64 -d | sed 's/\(.*\):.*/\1/' | grep "nonlinearlabs" > /dev/null; then
         podman login --tls-verify=false --authfile=$AUTH --username "nonlinearlabs" --password "@PODMAN_REGISTRY_PASSWORD@" @PODMAN_REGISTRY@
@@ -37,11 +49,26 @@ if [ "@DEVELOPER_ROLE@" = "pod-maintainer" ]; then
 
     if ! podman image exists @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@; then
         if [ -f $TWEAK ]; then
+            podman kill intermediate-@DOCKERFILE_SHA1@ || true
             podman container rm intermediate-@DOCKERFILE_SHA1@ || true
             podman build -t @PODMAN_REGISTRY@/intermediate:@DOCKERFILE_SHA1@ .
-            podman run -ti --privileged -v $TWEAK:/tweak.sh --name intermediate-@DOCKERFILE_SHA1@ --tls-verify=false --authfile=$AUTH @PODMAN_REGISTRY@/intermediate:@DOCKERFILE_SHA1@ /tweak.sh
-            podman commit --include-volumes intermediate-@DOCKERFILE_SHA1@ @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@
-            podman container rm intermediate-@DOCKERFILE_SHA1@
+
+            cp $TWEAK /tmp/intermediate-@DOCKERFILE_SHA1@-tweak.sh
+            echo "touch /done; while [ ! -f /commited ]; do sleep 1; done" >> /tmp/intermediate-@DOCKERFILE_SHA1@-tweak.sh
+            echo "Starting tweak of podman container..."
+
+            wait_for_tweak_and_commit &
+            SUBSHELL=$!
+
+            podman run \
+                --privileged -i \
+                --name intermediate-@DOCKERFILE_SHA1@ \
+                --tls-verify=false \
+                --authfile=$AUTH \
+                    @PODMAN_REGISTRY@/intermediate:@DOCKERFILE_SHA1@ < /tmp/intermediate-@DOCKERFILE_SHA1@-tweak.sh
+            
+            wait $SUBSHELL
+            podman container rm intermediate-@DOCKERFILE_SHA1@ || true
         else
             podman build -t @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@ .
             podman push --tls-verify=false --authfile=$AUTH generic:@DOCKERFILE_SHA1@ @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@        

@@ -1,5 +1,6 @@
 const singleBarLength = Math.round((4096 / 48000) * 1000 * 1000 * 1000);
 
+
 class Bar {
     id: number = 0;
     max: number = 0;

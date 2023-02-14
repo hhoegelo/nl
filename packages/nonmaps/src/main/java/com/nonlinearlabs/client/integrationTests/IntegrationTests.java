@@ -2,6 +2,7 @@ package com.nonlinearlabs.client.integrationTests;
 
 import com.google.gwt.core.client.Scheduler;
 
+
 public class IntegrationTests {
 
     public static void doAllTests() {

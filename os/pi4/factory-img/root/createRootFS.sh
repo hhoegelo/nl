@@ -19,7 +19,10 @@ tweak_root_partition() {
   OUT=/mnt/rootfs
   fuse2fs /rootfs.img $OUT
 
-  mount --bind /dev $OUT/dev
+  mount -o bind /dev $OUT/dev
+  mount -o bind /proc $OUT/proc
+  mount -o bind /dev/pts $OUT/dev/pts
+  mount -o bind /sys $OUT/sys
     
   echo "hostname"                       > $OUT/etc/dhcpcd.conf
   echo "clientid"                       >> $OUT/etc/dhcpcd.conf
@@ -150,6 +153,10 @@ tweak_root_partition() {
   rm -rf $OUT/etc/xdg/autostart/pprompt.desktop
   rm -rf $OUT/etc/xdg/autostart/print-applet.desktop
 
+  umount $OUT/sys
+  umount $OUT/dev/pts
+  umount $OUT/proc
+  umount $OUT/dev
   umount $OUT
 }
 
