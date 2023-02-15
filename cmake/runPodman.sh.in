@@ -1,11 +1,14 @@
 #!/bin/sh
 
 set -e
-
+set -x
 TWEAK="$1"
-
 AUTH=@CMAKE_BINARY_DIR@/podman-authentication
 A=$(jq -r ".auths.\"@PODMAN_REGISTRY@\".auth" $AUTH || echo "")
+
+is_pod_on_server() {
+    podman search --limit=999999 --list-tags --tls-verify=false --authfile=$AUTH quelltextlabor.de:5001/generic | grep @DOCKERFILE_SHA1@
+}
 
 if [ "@DEVELOPER_ROLE@" = "developer" ]; then
     ANON="anonymous"
@@ -14,7 +17,7 @@ if [ "@DEVELOPER_ROLE@" = "developer" ]; then
         podman login --tls-verify=false --authfile=$AUTH --username $ANON --password $ANON @PODMAN_REGISTRY@
     fi
 
-    if ! podman image exists @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@; then
+    if ! is_pod_on_server; then
         echo "*******************************************************"
         echo "*******************************************************"
         echo "*******************************************************"
@@ -47,7 +50,7 @@ if [ "@DEVELOPER_ROLE@" = "pod-maintainer" ]; then
         podman login --tls-verify=false --authfile=$AUTH --username "nonlinearlabs" --password "@PODMAN_REGISTRY_PASSWORD@" @PODMAN_REGISTRY@
     fi
 
-    if ! podman image exists @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@; then
+    if ! is_pod_on_server; then
         if [ -f $TWEAK ]; then
             podman kill intermediate-@DOCKERFILE_SHA1@ || true
             podman container rm intermediate-@DOCKERFILE_SHA1@ || true

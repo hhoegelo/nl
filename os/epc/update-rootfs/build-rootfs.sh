@@ -28,7 +28,6 @@ create_rootfs() { # Create clean folder and install c15 package and all its depe
   mkfs.ext4 /tmp/rootfs.img
   do_mount
   yes | /out/pacstrap $DIR @PACKAGES@
-  
 }
 
 tweak_rootfs() { # Tweak the resulting rootfs
@@ -62,7 +61,6 @@ cleanup_rootfs() { # Remove unused stuff to keep the resulting tar small
   rm -rf $DIR/etc/pacman.d
   rm -rf $DIR/usr/lib/libgo.*
   find $DIR/lib/firmware | grep -v "iwlwifi-QuZ" | xargs -I {} rm -rf {}
-  do_unmount
 }
 
 create_package() { # create the tarball
@@ -70,6 +68,7 @@ create_package() { # create the tarball
   tar -cf /out/update-rootfs.tar .
   rm -rf /out/update-rootfs.tar.xz
   xz -9 -z /out/update-rootfs.tar
+  do_unmount
 }
  
 create_rootfs
