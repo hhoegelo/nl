@@ -4,7 +4,7 @@ SET(ARCH_VERSION_DAY 25)
 SET(ARCH_VERSION ${ARCH_VERSION_YEAR}${ARCH_VERSION_MONTH}${ARCH_VERSION_DAY}.0.89186)
 
 SET(PACKAGES alsa-lib alsa-tools alsa-utils arch-install-scripts base boost 
-             cpupower dnsmasq flac freetype2 glibmm linux-firmware libpng linux-rt
+             cpupower dnsmasq flac freetype2 glibmm libpng linux-rt
              libsoup lm_sensors mc nano networkmanager png++ shared-mime-info 
              sudo sshfs lsof systemd-sysvcompat vi)
 
@@ -25,10 +25,11 @@ SET(RUN_POD podman run  --privileged
 
 add_custom_command(
     COMMENT "Build epc update rootfs"
-    OUTPUT epc-update-rootfs.img
+    OUTPUT os-epc-update-rootfs.tar
     DEPENDS ${POD_TARGET}
+    DEPENDS build-rootfs.sh
     VERBATIM
     COMMAND ${RUN_POD} /out/build-rootfs.sh
 )
 
-add_custom_target(os-epc-update-rootfs DEPENDS epc-update-rootfs.img)
+add_custom_target(os-epc-update-rootfs DEPENDS os-epc-update-rootfs.tar)

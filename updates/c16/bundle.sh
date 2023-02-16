@@ -34,6 +34,6 @@ umount $OUT/dev
 umount $OUT
 
 dd if=$OUT_DIR/update-c16.img.rootfs of=$OUT_DIR/update-c16.img seek=@PI4_FACTORY_BASE_IMAGE_ROOT_FS_POSITION@ count=@PI4_FACTORY_BASE_IMAGE_ROOT_FS_SIZE@
-tar -czf $OUT_DIR/update-c16.tar.gz -C $OUT_DIR ./update-c16.img
+tar -czf $OUT_DIR/update-c16.tar.gz $OUT_DIR/update-c16.img
 rm $OUT_DIR/update-c16.img
 rm $OUT_DIR/update-c16.img.rootfs

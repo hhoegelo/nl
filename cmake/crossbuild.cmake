@@ -107,11 +107,11 @@ list(TRANSFORM DEPENDENCIES PREPEND ${CMAKE_CURRENT_BINARY_DIR}/)
 add_custom_command(
   COMMENT "Build ${CROSS_BUILD_NAME}"
   DEPENDS ${DEPENDENCIES}
-  OUTPUT ${CROSS_BUILD_NAME}.tar.gz
-  COMMAND tar -czf ${CROSS_BUILD_NAME}.tar.gz -C ${CMAKE_CURRENT_BINARY_DIR} ${DEPENDENCIES_FILES}
+  OUTPUT ${CROSS_BUILD_NAME}.tar
+  COMMAND tar -cf ${CROSS_BUILD_NAME}.tar -C ${CMAKE_CURRENT_BINARY_DIR} ${DEPENDENCIES_FILES}
 )
 
-add_custom_target(${CROSS_BUILD_NAME} DEPENDS ${CROSS_BUILD_NAME}.tar.gz)
+add_custom_target(${CROSS_BUILD_NAME} DEPENDS ${CROSS_BUILD_NAME}.tar)
 endfunction()
 
 function(buildImage)
@@ -147,6 +147,6 @@ function(buildImage)
   
     add_custom_target(
         ${BUILD_IMAGE_NAME}
-        DEPENDS ${BUILD_IMAGE_NAME}.tar.gz        
+        DEPENDS ${BUILD_IMAGE_NAME}.tar.gz
     )
 endfunction()

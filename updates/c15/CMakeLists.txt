@@ -14,6 +14,11 @@ buildImage(
     DEPENDS update-c15-epc 
     DEPENDS update-c15-playcontroller 
     DEPENDS update-c15-web
-    BASE os/epc/update-img/epc-update.img
+    DEPENDS os-epc-update-rootfs
+    BASE os/epc/update-rootfs/os-epc-update-rootfs.tar
+    ADD updates/c15/beaglebone/update-c15-beaglebone.tar
+    ADD updates/c15/epc/update-c15-epc.tar
+    ADD updates/c15/playcontroller/update-c15-playcontroller.tar
+    ADD updates/c15/web/update-c15-web.tar
     POST_PROCESS_POD ${POD_URI}
     POST_PROCESS_SCRIPT bundle.sh)

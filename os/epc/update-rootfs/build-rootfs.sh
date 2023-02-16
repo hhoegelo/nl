@@ -6,8 +6,9 @@ set -x
 DIR=/tmp/p
 
 do_mount() {
+  mkdir -p /rootfs
   mkdir -p $DIR
-  fuse2fs /tmp/rootfs.img $DIR
+  mount -o bind /rootfs $DIR
   mkdir $DIR/dev $DIR/proc $DIR/dev/pts $DIR/sys
   mount -o bind /dev $DIR/dev
   mount -o bind /proc $DIR/proc
@@ -24,8 +25,6 @@ do_unmount() {
 }
 
 create_rootfs() { # Create clean folder and install c15 package and all its dependencies
-  truncate -s 5G /tmp/rootfs.img
-  mkfs.ext4 /tmp/rootfs.img
   do_mount
   yes | /out/pacstrap $DIR @PACKAGES@
 }
@@ -64,10 +63,8 @@ cleanup_rootfs() { # Remove unused stuff to keep the resulting tar small
 }
 
 create_package() { # create the tarball
-  cd $DIR
-  tar -cf /out/update-rootfs.tar .
-  rm -rf /out/update-rootfs.tar.xz
-  xz -9 -z /out/update-rootfs.tar
+  cd /rootfs
+  tar -cf /out/os-epc-update-rootfs.tar .
   do_unmount
 }
  
