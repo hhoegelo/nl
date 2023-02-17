@@ -16,6 +16,7 @@ endforeach()
 add_custom_command(
     COMMENT "Build Meteor App"
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/out/index.html
+    DEPENDS ${ALL_CLIENT_FILES}
     VERBATIM
     COMMAND node ${NODE_MODULES}/meteor-build-client/main.js ${CMAKE_CURRENT_BINARY_DIR}/out
     )
