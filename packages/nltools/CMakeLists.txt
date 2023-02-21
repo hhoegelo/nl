@@ -4,8 +4,6 @@ project(nltools)
 find_package(PkgConfig REQUIRED)
 include(GNUInstallDirs)
 
-# add_subdirectory(tests)
-
 file(GLOB_RECURSE HEADER_FILES ./include/*.h)
 file(GLOB_RECURSE SOURCE_FILES ./*.cpp)
 file(GLOB_RECURSE TEST_FILES ./tests/*)

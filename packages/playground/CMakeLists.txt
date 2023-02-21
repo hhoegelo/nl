@@ -83,6 +83,7 @@ include(${CMAKE_BINARY_DIR}/cmake/nltools.cmake)
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
 deb("nltools" "UI and Preset Management for Nonlinear Labs synthesizers")
 
+
 ######################################################
 ######################################################
 # PLAYGROUND TESTS BINARY ############################
@@ -103,3 +104,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS_LIBRARIES} ${LIBNAME})
 
 include(${CMAKE_BINARY_DIR}/cmake/nltools.cmake)
 include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)
+

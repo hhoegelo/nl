@@ -38,3 +38,4 @@ include(${CMAKE_BINARY_DIR}/cmake/nltools.cmake)
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
 
 deb("nltools" "Audio Engine for Nonlinear Labs synthesizers")
+

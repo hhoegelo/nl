@@ -1,0 +1,20 @@
+FROM docker.io/archlinux:base-20220925.0.89186
+
+RUN pacman-key --init && \
+    pacman --noconfirm -Sy && \
+    pacman --noconfirm -S archlinux-keyring && \
+    pacman-key --populate && \
+    pacman --noconfirm -Syu && \
+    pacman --noconfirm -S git fakeroot binutils sudo make gcc && \
+    useradd bob -m && \
+    passwd -d bob && \
+    printf 'bob ALL=(ALL) ALL\n' | tee -a /etc/sudoers && \
+    cd /tmp && \
+    sudo -u bob git clone https://aur.archlinux.org/yay-git.git && \
+    cd /tmp/yay-git && \
+    sudo -u bob makepkg -si --noconfirm && \
+    sudo -u bob yay --noconfirm -Syu && \
+    sudo -u bob yay --noconfirm -S dpkg && \
+    pacman --noconfirm -R yay-git git make gcc
+
+RUN pacman --noconfirm -S diffutils
