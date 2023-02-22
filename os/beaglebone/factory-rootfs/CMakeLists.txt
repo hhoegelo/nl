@@ -13,4 +13,20 @@ add_custom_command(
     COMMAND ${RUN_POD} cp /nonlinux/output/images/rootfs.tar.gz /out/os-beaglebone-factory-rootfs.tar.gz
 )
 
-add_custom_target(os-beaglebone-factory-rootfs DEPENDS os-beaglebone-factory-rootfs.tar.gz)
+add_custom_command(
+    COMMENT "Build Beaglebone factory MLO"
+    OUTPUT os-beaglebone-factory-MLO
+    DEPENDS ${POD_TARGET}
+    VERBATIM
+    COMMAND ${RUN_POD} cp /nonlinux/output/images/MLO /out/os-beaglebone-factory-MLO
+)
+
+add_custom_command(
+    COMMENT "Build Beaglebone factory u-boot"
+    OUTPUT os-beaglebone-factory-u-boot.img
+    DEPENDS ${POD_TARGET}
+    VERBATIM
+    COMMAND ${RUN_POD} cp /nonlinux/output/images/u-boot.img /out/os-beaglebone-factory-u-boot.img
+)
+
+add_custom_target(os-beaglebone-factory-rootfs DEPENDS os-beaglebone-factory-rootfs.tar.gz os-beaglebone-factory-MLO os-beaglebone-factory-u-boot.img)

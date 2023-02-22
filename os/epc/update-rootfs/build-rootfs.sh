@@ -50,15 +50,14 @@ tweak_rootfs() { # Tweak the resulting rootfs
 }
 
 cleanup_rootfs() { # Remove unused stuff to keep the resulting tar small
-  rm -rf $DIR/var/cache
-  rm -rf $DIR/var/lib/pacman
   rm -rf $DIR/usr/include
   rm -rf $DIR/usr/share/doc
+  rm -rf $DIR/usr/share/gtk-doc
   rm -rf $DIR/usr/share/man
   rm -rf $DIR/usr/share/locale
   rm -rf $DIR/usr/share/i18n/locales
-  rm -rf $DIR/etc/pacman.d
   rm -rf $DIR/usr/lib/libgo.*
+  rm -rf $DIR/usr/lib/modules/*
   find $DIR/lib/firmware | grep -v "iwlwifi-QuZ" | xargs -I {} rm -rf {}
 }
 

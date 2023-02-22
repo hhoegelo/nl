@@ -125,8 +125,11 @@ function(buildImage)
 
     if(BUILD_IMAGE_POST_PROCESS_POD)
         add_custom_command(
-            OUTPUT ${BUILD_IMAGE_NAME}.tar.gz
+            COMMENT "Post process image in pod ${BUILD_IMAGE_POST_PROCESS_POD}"
+            OUTPUT ${BUILD_IMAGE_NAME}.tar
             DEPENDS ${BUILD_IMAGE_DEPENDS}
+            DEPENDS ${BUILD_IMAGE_POST_PROCESS_SCRIPT}
+            DEPENDS ${CMAKE_BINARY_DIR}/${BUILD_IMAGE_BASE}
             COMMAND podman run 
                 --network=none
                 --authfile=${CMAKE_BINARY_DIR}/podman-authentication 
@@ -135,11 +138,13 @@ function(buildImage)
                 --rm 
                 -ti
                 -v ${CMAKE_BINARY_DIR}:${CMAKE_BINARY_DIR} 
+                -v ${CMAKE_BINARY_DIR}:/bindir 
                 ${BUILD_IMAGE_POST_PROCESS_POD} ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IMAGE_POST_PROCESS_SCRIPT} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/${BUILD_IMAGE_BASE} ${PCKGS}
         )
     else()
         add_custom_command(
-            OUTPUT ${BUILD_IMAGE_NAME}.tar.gz
+            COMMENT "Post process image in host"
+            OUTPUT ${BUILD_IMAGE_NAME}.tar
             DEPENDS ${BUILD_IMAGE_DEPENDS}
             COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${BUILD_IMAGE_POST_PROCESS_SCRIPT} ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}/${BUILD_IMAGE_BASE} ${PCKGS}
         )
@@ -147,6 +152,6 @@ function(buildImage)
   
     add_custom_target(
         ${BUILD_IMAGE_NAME}
-        DEPENDS ${BUILD_IMAGE_NAME}.tar.gz
+        DEPENDS ${BUILD_IMAGE_NAME}.tar
     )
 endfunction()

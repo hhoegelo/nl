@@ -27,17 +27,39 @@ do_unmount() {
   umount $DIR
 }
 
-mkdir -p /rootfs
-tar -xf $INPUT_ROOTFS -C /rootfs
-do_mount
 
-for PKG in $PACKAGES; do
-    tar -xf $PKG
-    dpkg --root=$DIR -i *.deb
-done
+main() {
+  mkdir -p /rootfs
+  tar -xf $INPUT_ROOTFS -C /rootfs
+  do_mount
+
+  PACKAGE_NAMES=""
+
+  for PKG in $PACKAGES; do
+      tar -xf $PKG
+      
+      for f in *.deb; do
+        debtap -Q $f
+        rm $f
+        PACKAGE_NAMES="$PACKAGE_NAMES $(basename $f .deb)"
+      done     
+  done
+
+  mkdir -p /mnt/nl
+  mv *.pkg.* /mnt/nl/
+  repo-add -q /mnt/nl/nl.db.tar.gz /mnt/nl/*.pkg.*
+  echo "[nl]" > /mnt/etc/pacman.conf && \
+  echo "Server = file:///nl/" >> /mnt/etc/pacman.conf && \
+  echo "SigLevel = Optional TrustAll" >> /mnt/etc/pacman.conf
+
+  /bindir/os/epc/update-rootfs/arch-chroot /mnt pacman --noconfirm -Sy 
+  /bindir/os/epc/update-rootfs/arch-chroot /mnt pacman --noconfirm -S $PACKAGE_NAMES
+
+  do_unmount
+
+  cd /rootfs
+  tar -cf /$OUT_DIR/update-c15-epc.tar .
+}
 
 
-do_unmount
-
-cd /rootfs
-tar -czf /$OUT_DIR/update-c15-epc.tar.gz .
+main
