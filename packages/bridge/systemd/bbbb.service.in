@@ -3,7 +3,7 @@ Description=Nonlinear-Labs BeagleBoneBlackBridge
 After=syslog.target network.target systemd-modules-load.service chkphy.service install-update-from-usb.service
 
 [Service]
-ExecStart=@C15_INSTALL_PATH@/bbbb/bbbb --playground-host=192.168.10.10
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/bridge --playground-host=192.168.10.10
 Restart=on-failure
 RestartSec=1
 

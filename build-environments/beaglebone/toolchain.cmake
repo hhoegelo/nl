@@ -13,6 +13,9 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
+set(KERNEL_VERSION "4.4.50")
+set(KERNEL_DIR "/nonlinux/output/build/linux-e02b6242a72c1cc81d4aec8153897efdab2e6ec8")
+set(CROSS_COMPILE "/nonlinux/output/host/usr/bin/arm-buildroot-linux-gnueabihf-")
 
 set(CMAKE_AR                        /nonlinux/output/host/usr/bin/arm-buildroot-linux-gnueabihf-ar)
 set(CMAKE_ASM_COMPILER              /nonlinux/output/host/usr/bin/arm-buildroot-linux-gnueabihf-gcc)

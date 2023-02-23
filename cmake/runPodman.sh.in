@@ -54,7 +54,7 @@ if [ "@DEVELOPER_ROLE@" = "pod-maintainer" ]; then
         if [ -f $TWEAK ]; then
             podman kill intermediate-@DOCKERFILE_SHA1@ || true
             podman container rm intermediate-@DOCKERFILE_SHA1@ || true
-            podman build -t @PODMAN_REGISTRY@/intermediate:@DOCKERFILE_SHA1@ .
+            podman build --tls-verify=false --authfile=$AUTH -t @PODMAN_REGISTRY@/intermediate:@DOCKERFILE_SHA1@ .
 
             cp $TWEAK /tmp/intermediate-@DOCKERFILE_SHA1@-tweak.sh
             echo "touch /done; while [ ! -f /commited ]; do sleep 1; done" >> /tmp/intermediate-@DOCKERFILE_SHA1@-tweak.sh
@@ -73,7 +73,7 @@ if [ "@DEVELOPER_ROLE@" = "pod-maintainer" ]; then
             wait $SUBSHELL
             podman container rm intermediate-@DOCKERFILE_SHA1@ || true
         else
-            podman build -t @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@ .
+            podman build --tls-verify=false --authfile=$AUTH -t @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@ .
             podman push --tls-verify=false --authfile=$AUTH generic:@DOCKERFILE_SHA1@ @PODMAN_REGISTRY@/generic:@DOCKERFILE_SHA1@        
         fi
     fi

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.5.1)
 project(bridge)
 
+include(GNUInstallDirs)
 find_package(PkgConfig REQUIRED)
 
 include(${CMAKE_BINARY_DIR}/cmake/systemd.cmake)
@@ -62,7 +63,7 @@ endforeach(SERVICE)
 
 install(DIRECTORY DESTINATION ${SYSTEMD_SERVICES_INSTALL_DIR}/multi-user.target.wants)
 install(DIRECTORY DESTINATION ${SYSTEMD_SERVICES_INSTALL_DIR}/sysinit.target.wants)
-install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
 include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)

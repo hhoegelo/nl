@@ -1,0 +1,3 @@
+obj-m += espi_driver.o
+espi_driver-y := @OBJECT_FILES@
+ccflags-y += -Os

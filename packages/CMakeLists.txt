@@ -1,5 +1,6 @@
 add_subdirectory(audio-engine/)
 add_subdirectory(bridge/)
+add_subdirectory(espi-driver/)
 add_subdirectory(meteor/)
 add_subdirectory(midi-over-ip/)
 add_subdirectory(nltools/)
