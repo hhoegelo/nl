@@ -6,15 +6,16 @@ add_subdirectory(playcontroller)
 
 configure_file(bundle.sh bundle.sh)
 
-file(GLOB_RECURSE UPDATE_SCRIPTS ${CMAKE_SOURCE_DIR}/update_scripts/*)
+file(GLOB_RECURSE UPDATE_SCRIPTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}/update_scripts/ *)
 
 foreach(FILE ${UPDATE_SCRIPTS})
-    configure_file(${FILE} ${FILE})
+    configure_file(update_scripts/${FILE} update_scripts/${FILE} COPYONLY)
 endforeach()
 
 registerPod()
 
 add_custom_command(
+    COMMENT "Build update for c15"
     OUTPUT update-c15.tar
     DEPENDS ${POD_TARGET}
     DEPENDS os-beaglebone-factory-rootfs # for MLO and u-boot
@@ -30,9 +31,10 @@ add_custom_command(
     COMMAND podman run 
         --authfile=${CMAKE_BINARY_DIR}/podman-authentication
         --tls-verify=false --rm -ti
+        --network=none
         -v ${CMAKE_BINARY_DIR}:/bindir
         -v ${CMAKE_CURRENT_BINARY_DIR}:/out 
-        ${PODMAN_REGISTRY}/generic:${DOCKERFILE_SHA1} /out/bundle.sh 
+        ${POD_URI} /out/bundle.sh 
             /out
             /bindir/os/beaglebone/factory-rootfs/os-beaglebone-factory-MLO
             /bindir/os/beaglebone/factory-rootfs/os-beaglebone-factory-u-boot.img

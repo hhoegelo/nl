@@ -1,31 +1,24 @@
 #!/bin/bash
-#
-# Date:         12.02.2020
-# vom Cmake übergebene Pfade zu den .tarS
 
 set -x
 
 OUT_DIR="$1"
-BBB_MLO="$1"
-BBB_UBOOT_IMG="$2"
-BBB_UPDATE="$3"
-EPC_UPDATE="$4"
-PLAYCONTROLLER_UPDATE="$5"
+BBB_MLO="$2"
+BBB_UBOOT_IMG="$3"
+BBB_UPDATE="$4"
+EPC_UPDATE="$5"
+PLAYCONTROLLER_UPDATE="$6"
 
-if [[ "$ASPECTS" = *epc* ]]
-then
-    UPDATE_EPC=1
-fi
+SOURCE_DIR="$OUT_DIR"
 
-if [[ "$ASPECTS" = *playcontroller* ]]
-then
-    UPDATE_PLAYCONTROLLER=1
-fi
+UPDATE_EPC="1"
+UPDATE_BBB="1"
+UPDATE_PLAYCONTROLLER="1"
+ASPECTS="playcontroller epc bbb"
 
-if [[ "$ASPECTS" = *bbb* ]]
-then
-    UPDATE_BBB=1
-fi
+OUT_TAR=$OUT_DIR/nonlinear-c15-update.tar
+
+OUT_DIRECTORY=/tmp/nonlinear-c15-update
 
 fail_and_exit() {
     echo "Failed to created an update!"
@@ -56,9 +49,12 @@ deploy_updates() {
 
     if [ "$UPDATE_BBB" = "1" ]; then
         echo "Will deploy BBB updates."
-        cp $BBB_UPDATE $OUT_DIRECTORY/BBB/ && chmod 666 $OUT_DIRECTORY/BBB/rootfs.tar.gz || fail_and_exit;
-        cp $BBB_MLO $OUT_DIRECTORY/BBB/ && chmod 666 $OUT_DIRECTORY/BBB/MLO || fail_and_exit;
-        cp $BBB_UBOOT_IMG $OUT_DIRECTORY/BBB/ && chmod 666 $OUT_DIRECTORY/BBB/u-boot.img || fail_and_exit;
+        cp $BBB_UPDATE $OUT_DIRECTORY/BBB/rootfs.tar || fail_and_exit;
+        gzip $OUT_DIRECTORY/BBB/rootfs.tar || fail_and_exit;
+        chmod 666 $OUT_DIRECTORY/BBB/rootfs.tar.gz || fail_and_exit;
+
+        cp $BBB_MLO $OUT_DIRECTORY/BBB/MLO && chmod 666 $OUT_DIRECTORY/BBB/MLO || fail_and_exit;
+        cp $BBB_UBOOT_IMG $OUT_DIRECTORY/BBB/u-boot.img && chmod 666 $OUT_DIRECTORY/BBB/u-boot.img || fail_and_exit;
 
         SUM=$(md5sum $OUT_DIRECTORY/BBB/MLO)
         echo $SUM | cut -d' ' -f1 >> $OUT_DIRECTORY/BBB/MLO_sum
@@ -131,11 +127,11 @@ deploy_scripts() {
 
 get_tools_from_rootfs() {
     echo "Getting tools from rootfs..."
-    rm -rf $BINARY_DIR/build-tools/bbb/rootfs
-    mkdir $BINARY_DIR/build-tools/bbb/rootfs && tar -xf $BBB_UPDATE --exclude=./dev/* -C $BINARY_DIR/build-tools/bbb/rootfs
+    
+    mkdir /tmp/rootfs && tar -xf $BBB_UPDATE --exclude=./dev/* -C /tmp/rootfs
 
     for i in mxli sshpass text2soled rsync socat thttpd playcontroller mke2fs; do
-        if ! cp $(find $BINARY_DIR/build-tools/bbb/rootfs -type f -name "$i" | head -n 1) $OUT_DIRECTORY/utilities/; then
+        if ! cp $(find /tmp/rootfs -type f -name "$i" | head -n 1) $OUT_DIRECTORY/utilities/; then
           echo "could not get $i from rootfs"
           return 1
         fi
@@ -149,13 +145,13 @@ get_tools_from_rootfs() {
     done
 
     for lib in libpopt.so.0.0.0 libpopt.so.0 libpopt.so; do
-        if ! cp $(find $BINARY_DIR/build-tools/bbb/rootfs/lib/ -name "$lib") $OUT_DIRECTORY/utilities/; then
+        if ! cp $(find /tmp/rootfs/lib/ -name "$lib") $OUT_DIRECTORY/utilities/; then
                echo "could not get library $lib from rootfs"
           return 1
         fi
     done
 
-    cp -R $BINARY_DIR/build-tools/bbb/rootfs/usr/C15/text2soled/resources $OUT_DIRECTORY/utilities/
+    cp -R /tmp/rootfs/usr/C15/text2soled/resources $OUT_DIRECTORY/utilities/
 
     echo "Getting tools from rootfs done."
     return 0
@@ -180,21 +176,19 @@ print_version_string() {
 print_C15_version_strings() {
     echo "Getting version strings..."
     if [ "$UPDATE_EPC" = "1" ]; then
-      FILE=$BINARY_DIR/build-tools/epc/tmp/usr/local/C15/playground/playground
+      FILE=/tmp/epc/tmp/usr/local/C15/playground/playground
       rm -f $FILE
-      mkdir -p $BINARY_DIR/build-tools/epc/tmp
-      tar -C $BINARY_DIR/build-tools/epc/tmp --extract --file=$BINARY_DIR/build-tools/epc/update.tar update/c15-rootfs.tar.xz
-      tar -C $BINARY_DIR/build-tools/epc/tmp --extract --file=$BINARY_DIR/build-tools/epc/tmp/update/c15-rootfs.tar.xz ./usr/local/C15/playground/playground
-      print_version_string $FILE
+      tar -C /tmp --extract --file=$OUT_DIRECTORY/EPC/update.tar ./usr/bin/playground
+      print_version_string /tmp/usr/bin/playground
     fi
     if [ "$UPDATE_PLAYCONTROLLER" = "1" ]; then
-        print_version_string $(find $BINARY_DIR/build-tools/playcontroller/ -type f -name "main.bin")
+        print_version_string $OUT_DIRECTORY/playcontroller/main.bin
     fi
     if [ "$UPDATE_BBB" = "1" ]; then
-        print_version_string $(find $BINARY_DIR/build-tools/bbb/rootfs/usr -type f -name "playcontroller")
-        print_version_string $(find $BINARY_DIR/build-tools/bbb/rootfs/usr -type f -name "playcontroller-read")
-        print_version_string $(find $BINARY_DIR/build-tools/bbb/rootfs/usr -type f -name "ehc")
-        print_version_string $(find $BINARY_DIR/build-tools/bbb/rootfs/usr -type f -name "ehc-preset")
+        print_version_string $(find /tmp/rootfs/usr -type f -name "playcontroller")
+        print_version_string $(find /tmp/rootfs/usr -type f -name "playcontroller-read")
+        print_version_string $(find /tmp/rootfs/usr -type f -name "ehc")
+        print_version_string $(find /tmp/rootfs/usr -type f -name "ehc-preset")
     fi
     echo "Getting version strings done."
 }

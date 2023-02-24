@@ -58,6 +58,9 @@ main() {
   do_unmount
 
   cd /rootfs
+
+  echo "UPDATE FOO HAS TO BE ADDED"
+  echo "RESULT HAS TO BE xz"
   tar -cf /$OUT_DIR/update-c15-epc.tar .
 }
 

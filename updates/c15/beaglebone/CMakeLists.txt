@@ -4,7 +4,7 @@ registerPod()
 
 crossBuild(
     NAME update-c15-beaglebone-bins
-    DEPENDS nltools midi-over-ip bridge[nltools] playcontroller-tools espi-driver)
+    DEPENDS nltools text2soled bridge[nltools] midi-over-ip[nltools] playcontroller-tools espi-driver playcontroller-driver)
 
 buildImage(
     NAME update-c15-beaglebone

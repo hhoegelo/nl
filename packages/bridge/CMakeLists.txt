@@ -3,6 +3,7 @@ project(bridge)
 
 include(GNUInstallDirs)
 find_package(PkgConfig REQUIRED)
+find_package(Threads REQUIRED)
 
 include(${CMAKE_BINARY_DIR}/cmake/systemd.cmake)
 find_systemd()
@@ -30,9 +31,6 @@ ENDIF(DEV_PC)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 include (${CMAKE_BINARY_DIR}/cmake/nltools.cmake)
 
-find_package(PkgConfig REQUIRED)
-find_package(Threads REQUIRED)
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wdouble-promotion")
 
 pkg_check_modules(LIBS REQUIRED ${LIBS})
@@ -48,17 +46,6 @@ foreach(SERVICE ${SERVICES})
   get_filename_component(SERVICENAME ${WITHOUT_IN} NAME)
   configure_file(${SERVICE} ${PROJECT_BINARY_DIR}/systemd/${SERVICENAME} @ONLY)
   install(FILES ${PROJECT_BINARY_DIR}/systemd/${SERVICENAME} DESTINATION ${SYSTEMD_SERVICES_INSTALL_DIR} COMPONENT init)
-
-  string(REGEX MATCH ".*-oneshot.service$" IS_ONESHOT ${SERVICENAME})
-
-  if("${IS_ONESHOT}" STREQUAL "")
-      install(CODE "execute_process(
-          COMMAND bash -c \"set -e
-          mkdir -p $DESTDIR/${SYSTEMD_SERVICES_INSTALL_DIR}/multi-user.target.wants
-          mkdir -p $DESTDIR/${SYSTEMD_SERVICES_INSTALL_DIR}/sysinit.target.wants
-          ln -sf ../${SERVICENAME} $DESTDIR/${SYSTEMD_SERVICES_INSTALL_DIR}/multi-user.target.wants/${SERVICENAME}
-          \")")
-  endif()
 endforeach(SERVICE)
 
 install(DIRECTORY DESTINATION ${SYSTEMD_SERVICES_INSTALL_DIR}/multi-user.target.wants)
