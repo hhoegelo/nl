@@ -1,0 +1,3 @@
+#!/bin/sh
+
+@CMAKE_INSTALL_FULL_BINDIR@/text2soled multitext "Shutting the C15 down...@SC1" "Please do not cut the power!@SC2" "Shutting the C15 down...@BC2" "Please do not cut the power!@BC4"
