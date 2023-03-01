@@ -47,11 +47,23 @@ namespace
     {
       if(numArgs > 2)
       {
-        auto resourcePath = std::string(c_resources) + "/resources/";
+        auto app = Gio::File::create_for_path(selfPath);
+        auto parent = app->get_parent();
+        auto parentPath = parent->get_path();
+        auto localResourcePath = parentPath + "/resources/";
 
-        Font f(resourcePath + "Emphase-8-Regular.ttf", 8);
-        FrameBuffer::get().setColor(FrameBuffer::C255);
-        f.draw(argv[0], atoi(argv[1]), atoi(argv[2]));
+        for(auto path : { localResourcePath, std::string { c_resources } })
+        {
+          auto fontFile = path + "Emphase-8-Regular.ttf";
+          if(Gio::File::create_for_path(selfPath)->query_exists())
+          {
+            Font f(fontFile, 8);
+            FrameBuffer::get().setColor(FrameBuffer::C255);
+            f.draw(argv[0], atoi(argv[1]), atoi(argv[2]));
+            return;
+          }
+        }
+        g_error("problem with the font");
       }
     }
 

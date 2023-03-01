@@ -30,4 +30,4 @@ install(FILES ${RESOURCE_FILES} DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/text2s
 
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
 include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)
-deb("text2soled" "Display text on soled or boled of c15")
+deb("" "Display text on soled or boled of c15")

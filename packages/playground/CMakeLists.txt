@@ -21,7 +21,6 @@ endif()
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBS REQUIRED glibmm-2.4 giomm-2.4 gio-unix-2.0 freetype2 uuid libpng libsoup-2.4)
 
-
 include(GNUInstallDirs)
 
 configure_file(src/CompileTimeOptions.h.in src/CompileTimeOptions.h)
@@ -76,7 +75,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 target_link_directories(${PROJECT_NAME} PRIVATE ${LIBS_LIBRARY_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${LIBS_LIBRARIES} ${LIBNAME})
 
-install(TARGETS ${PROJECT_NAME})
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 install(DIRECTORY ./resources/ DESTINATION ${CMAKE_INSTALL_DATADIR}/playground)
 
 include(${CMAKE_BINARY_DIR}/cmake/nltools.cmake)

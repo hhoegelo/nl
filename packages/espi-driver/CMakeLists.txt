@@ -40,5 +40,5 @@ if(KERNEL_DIR)
     add_custom_target(espi-driver ALL DEPENDS espi_driver.ko)
 
     include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
-    deb("espi-driver" "Beaglebon driver to connect to c15 hardware UI")
+    deb("" "Beaglebon driver to connect to c15 hardware UI")
 endif()

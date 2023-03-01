@@ -4,6 +4,7 @@
 
 #define EHC_ADC_MAX (65520ul)
 
+
 const EHC_PresetT EHC_presets[] = {
   {
       .id          = EHC_PRESET_Pot_Tip_Active,

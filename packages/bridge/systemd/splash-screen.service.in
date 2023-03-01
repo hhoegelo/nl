@@ -16,4 +16,4 @@ ConditionKernelCommandLine=|rd.modules-load
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=-@C15_INSTALL_PATH@/scripts/display-splashscreen.sh
+ExecStart=-@CMAKE_INSTALL_FULL_BINDIR@/display-splashscreen.sh

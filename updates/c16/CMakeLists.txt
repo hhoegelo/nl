@@ -1,6 +1,7 @@
 SET(PROJECT c15)
 
 add_subdirectory(pi4)
+add_subdirectory(web)
 
 include(${CMAKE_SOURCE_DIR}/cmake/pi4-image-def.cmake)
 

@@ -16,7 +16,7 @@ registerPod()
 
 add_custom_command(
     COMMENT "Build update for c15"
-    OUTPUT update-c15.tar
+    OUTPUT nonlinear-c15-update.tar
     DEPENDS ${POD_TARGET}
     DEPENDS os-beaglebone-factory-rootfs # for MLO and u-boot
     DEPENDS update-c15-beaglebone 
@@ -43,4 +43,4 @@ add_custom_command(
             /out/playcontroller/update-c15-playcontroller.tar
 )
 
-add_custom_target(update-c15 DEPENDS update-c15.tar)
+add_custom_target(update-c15 DEPENDS nonlinear-c15-update.tar)

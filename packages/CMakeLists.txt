@@ -1,5 +1,7 @@
 add_subdirectory(audio-engine/)
+add_subdirectory(beaglebone-scripts/)
 add_subdirectory(bridge/)
+add_subdirectory(epc-scripts/)
 add_subdirectory(meteor/)
 add_subdirectory(midi-over-ip/)
 add_subdirectory(nltools/)

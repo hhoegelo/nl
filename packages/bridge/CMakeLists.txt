@@ -6,7 +6,6 @@ find_package(PkgConfig REQUIRED)
 find_package(Threads REQUIRED)
 
 include(${CMAKE_BINARY_DIR}/cmake/systemd.cmake)
-find_systemd()
 
 set(LIBS giomm-2.4 libsoup-2.4)
 

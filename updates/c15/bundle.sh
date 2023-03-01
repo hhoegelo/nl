@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -x
+set -e
 
 OUT_DIR="$1"
 BBB_MLO="$2"
@@ -70,7 +71,11 @@ deploy_updates() {
 
     if [ "$UPDATE_PLAYCONTROLLER" = "1" ]; then
         echo "Will deploy playcontroller update."
-        cp $PLAYCONTROLLER_UPDATE $OUT_DIRECTORY/playcontroller/main.bin && chmod 666 $OUT_DIRECTORY/playcontroller/main.bin || fail_and_exit;
+        cd /tmp
+        tar -x -f $PLAYCONTROLLER_UPDATE
+        ar -x /tmp/playcontroller-firmware.deb data.tar.gz
+        tar -xf /tmp/data.tar.gz
+        cp /tmp/usr/local/bin/playcontroller-firmware-main.bin $OUT_DIRECTORY/playcontroller/main.bin && chmod 666 $OUT_DIRECTORY/playcontroller/main.bin || fail_and_exit;
     fi
 
     echo "Deploying updates done."
@@ -151,7 +156,10 @@ get_tools_from_rootfs() {
         fi
     done
 
-    cp -R /tmp/rootfs/usr/C15/text2soled/resources $OUT_DIRECTORY/utilities/
+    if ! cp -R /tmp/rootfs/usr/local/share/text2soled $OUT_DIRECTORY/utilities/resources; then
+        echo "could not get text2soled resources"
+        return 1
+    fi
 
     echo "Getting tools from rootfs done."
     return 0
@@ -169,39 +177,13 @@ create_update_tar () {
     return 1
 }
 
-print_version_string() {
-    [ ! -z "$1" ] && echo " " $(grep -m 1 --binary-files=text "C15 Version" $1 | sed '$ s/\x00*$//') " (" $1 ")"
-}
-
-print_C15_version_strings() {
-    echo "Getting version strings..."
-    if [ "$UPDATE_EPC" = "1" ]; then
-      FILE=/tmp/epc/tmp/usr/local/C15/playground/playground
-      rm -f $FILE
-      tar -C /tmp --extract --file=$OUT_DIRECTORY/EPC/update.tar ./usr/bin/playground
-      print_version_string /tmp/usr/bin/playground
-    fi
-    if [ "$UPDATE_PLAYCONTROLLER" = "1" ]; then
-        print_version_string $OUT_DIRECTORY/playcontroller/main.bin
-    fi
-    if [ "$UPDATE_BBB" = "1" ]; then
-        print_version_string $(find /tmp/rootfs/usr -type f -name "playcontroller")
-        print_version_string $(find /tmp/rootfs/usr -type f -name "playcontroller-read")
-        print_version_string $(find /tmp/rootfs/usr -type f -name "ehc")
-        print_version_string $(find /tmp/rootfs/usr -type f -name "ehc-preset")
-    fi
-    echo "Getting version strings done."
-}
-
 main() {
-    set -e
     check_preconditions || fail_and_exit
     create_update_file_structure || fail_and_exit
     deploy_updates || fail_and_exit
     deploy_scripts || fail_and_exit
     get_tools_from_rootfs || fail_and_exit
     create_update_tar || fail_and_exit
-    print_C15_version_strings
 }
 
 main

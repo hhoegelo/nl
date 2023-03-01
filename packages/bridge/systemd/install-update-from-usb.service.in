@@ -5,7 +5,7 @@ Before=bbbb.service
 
 [Service]
 Type=oneshot
-ExecStart=@C15_INSTALL_PATH@/scripts/install-update.sh
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/install-update.sh
 
 [Install]
 WantedBy=multi-user.target

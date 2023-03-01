@@ -3,7 +3,7 @@ Description=Fix CPU bindings
 After=syslog.target persistent.mount audio-engine.service
 
 [Service]
-ExecStart=@C15_INSTALL_PATH@/scripts/fixCpuBindings.sh
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/fixCpuBindings.sh
 Type=oneshot
 RemainAfterExit=yes
 

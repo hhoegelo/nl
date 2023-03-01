@@ -6,7 +6,6 @@ find_package(PkgConfig REQUIRED)
 find_package(Threads REQUIRED)
 
 include(${CMAKE_BINARY_DIR}/cmake/systemd.cmake)
-find_systemd()
 
 set(LIBS alsa giomm-2.4 glibmm-2.4)
 
@@ -40,4 +39,4 @@ install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR}
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
 include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)
 
-deb("midi-over-ip" "Bridges alsa midi from BBB to EPC")
+deb("" "Bridges alsa midi from BBB to EPC")

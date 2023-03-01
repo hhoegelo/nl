@@ -30,5 +30,5 @@ if(KERNEL_DIR)
     add_custom_target(playcontroller-driver ALL DEPENDS lpc_bb_driver.ko)
 
     include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
-    deb("playcontroller-driver" "Beaglebon driver to connect to c15 playcontroller chip")
+    deb("" "Beaglebon driver to connect to c15 playcontroller chip")
 endif()

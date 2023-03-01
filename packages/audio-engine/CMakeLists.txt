@@ -30,7 +30,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR}/shared)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${LIBS_LIBRARIES})
 
-install(TARGETS ${PROJECT_NAME})
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 
 include(${CMAKE_BINARY_DIR}/cmake/ccache.cmake)
 include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)

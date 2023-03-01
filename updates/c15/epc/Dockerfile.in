@@ -18,3 +18,5 @@ RUN pacman-key --init && \
     pacman --noconfirm -R yay-git git make gcc
 
 RUN debtap -u
+RUN pacman --noconfirm -S wget
+RUN wget http://h2949050.stratoserver.net/build-tools2/xz-5.2.5-linux-x86_64.tar.gz -O /xz-5.2.5-linux-x86_64.tar.gz

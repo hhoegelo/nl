@@ -1,6 +1,7 @@
 project (playcontroller-firmware-main)
 
 include(${CMAKE_BINARY_DIR}/cmake/package.cmake)
+include(GNUInstallDirs)
 
 file(GLOB_RECURSE SOURCES ./src/*.c ../shared/*.c)
 add_executable(${PROJECT_NAME} ${SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/../co-proc/playcontroller-firmware-coproc.o)
@@ -24,8 +25,8 @@ set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "${CMAKE_C_FLAGS}
 add_custom_command(
   TARGET ${PROJECT_NAME}
   POST_BUILD
-  COMMAND arm-none-eabi-objcopy -Obinary ${PROJECT_NAME})
+  COMMAND arm-none-eabi-objcopy -Obinary ${PROJECT_NAME} ${PROJECT_NAME}.bin)
 
-install(TARGETS ${PROJECT_NAME} DESTINATION bin)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.bin DESTINATION ${CMAKE_INSTALL_FULL_BINDIR})
 include(${CMAKE_BINARY_DIR}/cmake/configuration.cmake)
 deb("" "C15 Playcontroller firmware")

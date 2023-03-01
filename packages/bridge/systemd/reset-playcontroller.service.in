@@ -5,5 +5,5 @@ Before=install-update-from-usb.service
 
 [Service]
 Type=oneshot
-ExecStart=-@C15_INSTALL_PATH@/scripts/reset-playcontroller.sh
-ExecStart=-@C15_INSTALL_PATH@/scripts/display-splashscreen.sh
+ExecStart=-@CMAKE_INSTALL_FULL_BINDIR@/reset-playcontroller.sh
+ExecStart=-@CMAKE_INSTALL_FULL_BINDIR@/display-splashscreen.sh

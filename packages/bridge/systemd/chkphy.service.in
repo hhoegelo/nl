@@ -5,5 +5,5 @@ Wants=network.target
 
 [Service]
 Type=oneshot
-ExecStart=@C15_INSTALL_PATH@/scripts/bbb-check-phy.sh
+ExecStart=@CMAKE_INSTALL_FULL_BINDIR@/bbb-check-phy.sh
 TimeoutSec=0

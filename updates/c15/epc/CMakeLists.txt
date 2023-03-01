@@ -4,9 +4,14 @@ add_subdirectory(web)
 
 crossBuild(
     NAME update-c15-epc-bins 
-    DEPENDS nltools audio-engine[nltools] playground[nltools])
+    DEPENDS nltools audio-engine[nltools] playground[nltools] epc-scripts)
 
 registerPod()
+
+configure_file(backdoor.sh backdoor.sh)
+configure_file(C15.nmconnection C15.nmconnection)
+configure_file(post-install.sh post-install.sh)
+configure_file(wpa_supplicant.conf wpa_supplicant.conf)
 
 buildImage(
     NAME update-c15-epc
