@@ -1,9 +1,8 @@
-SET(TARGET_MACHINE beaglebone)
-
 registerPod()
 
 crossBuild(
     NAME update-c15-beaglebone-bins
+    MACHINE beaglebone
     DEPENDS nltools text2soled bridge[nltools] midi-over-ip[nltools] playcontroller-tools espi-driver playcontroller-driver beaglebone-scripts)
 
 buildImage(

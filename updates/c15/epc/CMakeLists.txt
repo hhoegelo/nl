@@ -1,9 +1,8 @@
-SET(TARGET_MACHINE epc)
-
 add_subdirectory(web)
 
 crossBuild(
     NAME update-c15-epc-bins 
+    MACHINE epc
     DEPENDS nltools audio-engine[nltools] playground[nltools] epc-scripts)
 
 registerPod()

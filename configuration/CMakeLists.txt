@@ -1,7 +1,6 @@
 project(parameterDB-new)
 
 set(BUILD_TASK configuration)
-set(TARGET_MACHINE devpc)
 
 registerPod(DEPENDENCIES package.json)
 

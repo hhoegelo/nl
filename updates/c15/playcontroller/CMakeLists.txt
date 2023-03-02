@@ -1,5 +1,4 @@
-SET(TARGET_MACHINE playcontroller)
-
 crossBuild(
-    NAME update-c15-playcontroller 
+    NAME update-c15-playcontroller
+    MACHINE playcontroller
     DEPENDS playcontroller-firmware)

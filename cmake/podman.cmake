@@ -46,7 +46,7 @@ function(registerPod)
     configure_file(${CMAKE_SOURCE_DIR}/cmake/runPodman.sh.in ${CMAKE_CURRENT_BINARY_DIR}/runPodman.sh)
     
     add_custom_command(
-      COMMENT "Provide Podman for ${BUILD_TASK}/${TARGET_MACHINE}/${DOCKERFILE_SHA1} depends on ${POD_DEPENDENCY}"
+      COMMENT "Provide Podman for ${BUILD_TASK} / ${DOCKERFILE_SHA1} depends on ${POD_DEPENDENCY}"
       OUTPUT .podman-${DOCKERFILE_SHA1}
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/Dockerfile
       DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/runPodman.sh
