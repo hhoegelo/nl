@@ -1,0 +1,124 @@
+\documentclass[11pt]{article}
+           
+\usepackage[utf8]{inputenc}                
+\usepackage[fancyhdr]{latex2man}
+\usepackage[colorlinks = true,linkcolor=blue]{hyperref}
+
+\setVersion{0.1}
+\begin{document}
+\begin{Name}{1}{nl build system}{Henry Hoegelow}{General information on the Nonlinear Labs Build System}{NL Build System}
+
+The build system of out C15 project has become quite rotten in the last years. There were a lot attempts to integrate new concepts and ideas. Most of them left some traces in the project, some stuff is still used, others is not, documentation and a clear concept is missing. The new build system described here aim to solve all the issues found during the last years with a clear and well documented concept.
+
+\section{General}
+
+\subsection{Conventions}
+There are some conventions that glue the different parts of the build system together:
+\begin{itemize}
+\item Target names are tied to the folder structure: 
+\begin{verbatim}
+/os/pi4/factory => make os-pi4-factory
+/update/c15 => make update-c15
+/update/c15/epc => make update-c15-epc
+\end{verbatim}
+\item Machine names have to be used consistently in /build-environments, /os and /updates folders:
+\begin{itemize} \label{machine}
+\item epc
+\item beaglebone
+\item pi4
+\item web
+\item playcontroller
+\item supervisor
+\end{itemize}
+\end{itemize}
+
+\section{Scopes}
+
+\subsection{os}
+The targets in the /os folder produce images (.img or .iso) or root filesystem tars. 
+
+\subsubsection{factory}
+Targets in the /os/\{machine\}/factory folders shall produce images that can be used to initially hook up a machine in the factory. For the epc, the will be an iso file that can be used to install the base os, for pi4 and beaglebone this may be an image to be written on a sd card.
+
+\subsubsection{update} \label{os-update}
+Targets in /os/\{machine\}/update folders shall produce tar files containing complete root file systems for the given machine, without any product specific software. In contrast to our \hyperref[packages]{packages}, which should not be installed at this place, all system libraries needed by those packages have to be installed here.\\
+\emph{This is not the best solution and may be improved later.}
+
+\subsection{packages} \label{packages}
+All our self-written software is divided into packages. The term "package" is used to underline that each of this sub-projects is required to pack itself into a \hyperref[cmake-package]{debian package}. The CMakeList files in the packages subfolders should not fiddle with podman or docker, nor should they care for installing libraries, tools or whatsoever. Packages, when building, expect to find everything they need in their environment.\\
+\emph{Maybe we should modify packages CMakeLists, so they check for all tools needed and disable un-buildable targets if tools are missing?}
+
+\subsection{build-environments} \label{buildenv}
+Build-environments, located in /build-environments/\{machine\}, have to bundle all tools and libraries needed to build \hyperref[packages]{packages} for a given \hyperref[machine]{machine}. They have to play together nicely with \hyperref[os-update]{update os tars} in a sense, that build-environments have to provide tools and development libraries that a later expected by the runtime linker to exist in the update root filesystem.\\
+A build-environment has to provide a toolchain.cmake file setting up all cmake variables needed for a proper cross build.
+
+\subsection{updates}
+In the updates folder, all previously explained concepts coalesce in targets producing update files to be put on USB sticks, spread over-the-air or uploaded onto the target devices.\\
+Here, root file systems produced by targets in \hyperref[os-update]{/os/\{machine\}/update} are extends with \hyperref[packages]{packages}, cross-built in \hyperref[buildenv]{/build-environments/\{machine\}/} and bundled by update-specific shell scripts.
+
+\section{Podman} \label{pod}
+The build system heavily relies on podman. It is used to solve various problems, previously sorted out by handwritten solutions:
+\begin{itemize}
+\item Provide environment with tools and libraries
+\item Provide environment to emulate foreign architecture
+\item Store packages and tools needed to build our targets
+\item Cache stuff on the developer computer
+\item Provide independence from 3rd-party servers by running our own docker registry
+\item Support versioned collections of packages and tools
+\item Speed up build
+\end{itemize}
+
+\subsection{Registry}
+The docker registry (currently hosted by quelltextlabor.de) allows read-only access for "normal" developers and "read/write" access for so-called "pod-maintainers".
+
+\subsubsection{Developer roles}
+\paragraph{developer}
+"Normal" developers have only read access to the docker registry. This means, that the build system will try to fetch ready-built containers from the registry during build. You can switch to this role by issuing the follwing command in your build directory:
+\begin{verbatim}
+cmake -DDEVELOPER_ROLE=developer .
+\end{verbatim}
+If the system cannot fetch a podman container in the required version, the build will fail. Most this is because you changed a Dockerfile or some variables or files, that are baked into the container. If you did this deliberatly, you should change your role to \hyperref[pod-maintainer]{pod-maintainer}.
+
+\paragraph{pod-maintainer} \label{pod-maintainer}
+Pod-Maintainer have read/write access to the registry. They can change contents of Dockerfiles and files or variables that somehow influence the building of a container. As soon, as a container could be successfully built on the pod-maintainers machine, it is uploaded to the registry so it is available for other developers.\\
+Switch to this role by issuing:
+\begin{verbatim}
+cmake -DDEVELOPER_ROLE=pod-maintainer .
+\end{verbatim}
+On next build time, you will be asked for a password. If you don't know the right password, you are probably not a NL developer.
+
+\subsubsection{Versioning}
+All containers used here share the same name: "generic". They differ by the version postfix, which is generated by hashing the Dockerfile contents and all files or variables given when registering the container.\\
+This means, that you can unscrupulously switch between branches, relying on properly versioned pods.
+
+\section{Configuration}
+
+\subsection{Why?} \label{whygenerated}
+The whole project is configurable by yaml files, describing global properties like number of voices, available parameters, parameter ranges and so on. This properties have to be used in multiple \hyperref[packages]{packages} and it is very crucial that they are in sync. Also, package authors are free to decide which tools or languages they use, so this global properties have to be available for C/C++, java, javascript, typescript,...
+
+\subsection{How?}
+We use TypeScript for transpiling the yaml files into target language code files. The TypeScript environment is somewhat special and needs careful setup. Thatswhy I moved it into a \hyperref[pod]{pod} and integrated it into the build system in a way, that thje actual transpilation process is done only once for the whole project. The result is than injected into the build-environments, so that the environments do not have to care for all the TypeScript foo.
+
+\section{CMake}
+The project uses CMake as build system generator. You can use it with make or ninja, both should work.
+
+\subsection{Includes and Functions}
+Repeating tasks are implemented in include files and functions, residing at /cmake.
+
+\subsubsection{configuration}
+The /cmake/configuration.cmake file should be included by every package that needs access to \hyperref[whygenerated]{the generated files}. When building natively, it will just include the generated files. On cross-build, it will add the injected generated files from the outer project to the include paths.
+
+\subsubsection{package} \label{cmake-package}
+Each \hyperref[packages]{package} has to include the /cmake/package.cmake file and end with a line calling the "deb" function:\\
+\\
+\Prog{deb}("\Arg{dependency-target, \Dots}", "\Arg{description}")\\
+\\
+for example in audio-engine/CMakeLists.txt:
+\begin{verbatim}
+deb("nltools" "Audio Engine for Nonlinear Labs synthesizers")
+\end{verbatim}
+This will generate a debian package \{PROJECT\_NAME\}.deb that can be used by the tools and scripts to finally build the update.
+
+
+\end{Name}
+\end{document}
