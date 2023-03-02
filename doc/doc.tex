@@ -1,14 +1,19 @@
 \documentclass[11pt]{article}
            
-\usepackage[utf8]{inputenc}                
+\usepackage[utf8]{inputenc}      
+\usepackage{lmodern}          
 \usepackage[fancyhdr]{latex2man}
 \usepackage[colorlinks = true,linkcolor=blue]{hyperref}
 
 \setVersion{0.1}
+
+
+% \newcommand{\hyperref}[2]{{#2}}
+
 \begin{document}
 \begin{Name}{1}{nl build system}{Henry Hoegelow}{General information on the Nonlinear Labs Build System}{NL Build System}
 
-The build system of out C15 project has become quite rotten in the last years. There were a lot attempts to integrate new concepts and ideas. Most of them left some traces in the project, some stuff is still used, others is not, documentation and a clear concept is missing. The new build system described here aim to solve all the issues found during the last years with a clear and well documented concept.
+The build system of our C15 project has become quite rotten in the last years. There were a lot of attempts to integrate new concepts and ideas. Most of them left some traces in the project, some stuff is still used, others is not, documentation and a clear concept is missing. The new build system described here aims at solving all the issues found during the last years with a clear and well documented concept.
 
 \section{General}
 
@@ -42,19 +47,21 @@ Targets in the /os/\{machine\}/factory folders shall produce images that can be 
 
 \subsubsection{update} \label{os-update}
 Targets in /os/\{machine\}/update folders shall produce tar files containing complete root file systems for the given machine, without any product specific software. In contrast to our \hyperref[packages]{packages}, which should not be installed at this place, all system libraries needed by those packages have to be installed here.\\
+\\
 \emph{This is not the best solution and may be improved later.}
 
 \subsection{packages} \label{packages}
 All our self-written software is divided into packages. The term "package" is used to underline that each of this sub-projects is required to pack itself into a \hyperref[cmake-package]{debian package}. The CMakeList files in the packages subfolders should not fiddle with podman or docker, nor should they care for installing libraries, tools or whatsoever. Packages, when building, expect to find everything they need in their environment.\\
+\\
 \emph{Maybe we should modify packages CMakeLists, so they check for all tools needed and disable un-buildable targets if tools are missing?}
 
 \subsection{build-environments} \label{buildenv}
-Build-environments, located in /build-environments/\{machine\}, have to bundle all tools and libraries needed to build \hyperref[packages]{packages} for a given \hyperref[machine]{machine}. They have to play together nicely with \hyperref[os-update]{update os tars} in a sense, that build-environments have to provide tools and development libraries that a later expected by the runtime linker to exist in the update root filesystem.\\
+Build-environments, located in /build-environments/\{machine\}, have to bundle all tools and libraries needed to build \hyperref[packages]{packages} for a given \hyperref[machine]{machine}. They have to play together nicely with \hyperref[os-update]{update os tars} in a sense, that build-environments have to provide tools and development versions of libraries that are expected to exist in the update root filesystem by the runtime linker.\\
 A build-environment has to provide a toolchain.cmake file setting up all cmake variables needed for a proper cross build.
 
 \subsection{updates}
 In the updates folder, all previously explained concepts coalesce in targets producing update files to be put on USB sticks, spread over-the-air or uploaded onto the target devices.\\
-Here, root file systems produced by targets in \hyperref[os-update]{/os/\{machine\}/update} are extends with \hyperref[packages]{packages}, cross-built in \hyperref[buildenv]{/build-environments/\{machine\}/} and bundled by update-specific shell scripts.
+Here, root file systems produced by targets in \hyperref[os-update]{/os/\{machine\}/update} are extended with \hyperref[packages]{packages}, cross-built in \hyperref[buildenv]{/build-environments/\{machine\}/} and bundled by update-specific shell scripts.
 
 \section{Podman} \label{pod}
 The build system heavily relies on podman. It is used to solve various problems, previously sorted out by handwritten solutions:
@@ -77,10 +84,10 @@ The docker registry (currently hosted by quelltextlabor.de) allows read-only acc
 \begin{verbatim}
 cmake -DDEVELOPER_ROLE=developer .
 \end{verbatim}
-If the system cannot fetch a podman container in the required version, the build will fail. Most this is because you changed a Dockerfile or some variables or files, that are baked into the container. If you did this deliberatly, you should change your role to \hyperref[pod-maintainer]{pod-maintainer}.
+If the system cannot fetch a podman container in the required version, the build will fail. Most probably this is because you changed a Dockerfile or some variables or files, that are baked into the container. If you did this deliberatly, you should change your role to \hyperref[pod-maintainer]{pod-maintainer}.
 
 \paragraph{pod-maintainer} \label{pod-maintainer}
-Pod-Maintainer have read/write access to the registry. They can change contents of Dockerfiles and files or variables that somehow influence the building of a container. As soon, as a container could be successfully built on the pod-maintainers machine, it is uploaded to the registry so it is available for other developers.\\
+Pod-Maintainers have read/write access to the registry. They can change contents of Dockerfiles and files or variables that somehow influence the building of a container. As soon as a container could be successfully built on the pod-maintainers machine, it is uploaded to the registry so it is available for other developers.\\
 Switch to this role by issuing:
 \begin{verbatim}
 cmake -DDEVELOPER_ROLE=pod-maintainer .
@@ -89,7 +96,9 @@ On next build time, you will be asked for a password. If you don't know the righ
 
 \subsubsection{Versioning}
 All containers used here share the same name: "generic". They differ by the version postfix, which is generated by hashing the Dockerfile contents and all files or variables given when registering the container.\\
-This means, that you can unscrupulously switch between branches, relying on properly versioned pods.
+This means, that you can unscrupulously switch between branches, relying on properly versioned pods.\\
+\\
+\emph{Note, that this is much better than before, but still not perfect: If you do only a slight change to the Dockerfile, it will be rebuilt. If rebuilding the image incorporates fetching stuff from the internet (which it usually does) than the result of the build might differ significantly from the previous image. This can even break the build - so be careful with being a pod-maintainer}
 
 \section{Configuration}
 
@@ -97,13 +106,41 @@ This means, that you can unscrupulously switch between branches, relying on prop
 The whole project is configurable by yaml files, describing global properties like number of voices, available parameters, parameter ranges and so on. This properties have to be used in multiple \hyperref[packages]{packages} and it is very crucial that they are in sync. Also, package authors are free to decide which tools or languages they use, so this global properties have to be available for C/C++, java, javascript, typescript,...
 
 \subsection{How?}
-We use TypeScript for transpiling the yaml files into target language code files. The TypeScript environment is somewhat special and needs careful setup. Thatswhy I moved it into a \hyperref[pod]{pod} and integrated it into the build system in a way, that thje actual transpilation process is done only once for the whole project. The result is than injected into the build-environments, so that the environments do not have to care for all the TypeScript foo.
+We use TypeScript for transpiling the yaml files into target language code files. The TypeScript environment is somewhat special and needs careful setup. Thatswhy I moved it into a \hyperref[pod]{pod} and integrated it into the build system in a way, that the actual transpilation process is done only once for the whole project. The result is than injected into the build-environments, so that the environments do not have to care for all the TypeScript foo.
 
 \section{CMake}
 The project uses CMake as build system generator. You can use it with make or ninja, both should work.
 
 \subsection{Includes and Functions}
 Repeating tasks are implemented in include files and functions, residing at /cmake.
+
+\subsubsection{registerPod}
+To make use of the automated pod handling, pods have to be registered using registerPod():\\
+\\
+\Prog{registerPod}(\\
+\indent\oArg{DEPENDS\_ON\_POD \$\{HASH\_OF\_OTHER\_POD\}}\\
+\indent\oArg{TWEAK\_IMAGE skript.sh}\\
+\indent\oArg{CONFIGURED\_DEPENDENCIES filename \Dots }\\
+\indent\oArg{CONFIGURED\_DEPENDENCIES\_COPYONLY filename \Dots}\\
+\indent\oArg{DEPENDENCIES target \Dots }\\
+\indent\oArg{BUILT\_DEPENDENCIES file \Dots }\\
+\indent\oArg{USED\_VARIABLES \$\{VAR\} \Dots })\\
+\\
+for example:
+\begin{verbatim}
+registerPod(
+	CONFIGURED_DEPENDENCIES_COPYONLY sda.sfdisk 
+	CONFIGURED_DEPENDENCIES_COPYONLY install-factory-os.sh
+	CONFIGURED_DEPENDENCIES generatePkgBuild.sh install.sh
+	USED_VARIABLES ${PACKAGES})
+\end{verbatim}
+This will configure the files sda.sfdisk, install-factory-os.sh, generatePkgBuild.sh and install.sh, the latter two with replacing of cmake variables. It will calculate a hash of
+\begin{itemize}
+\item the configured Dockerfile.in in the current folder
+\item the configured files given as dependencies
+\item the used variables
+\end{itemize}
+and use the resulting hash as version number of the pod. The resulting pod will be referenced as generic:<<SHA1>>.
 
 \subsubsection{configuration}
 The /cmake/configuration.cmake file should be included by every package that needs access to \hyperref[whygenerated]{the generated files}. When building natively, it will just include the generated files. On cross-build, it will add the injected generated files from the outer project to the include paths.
@@ -119,6 +156,49 @@ deb("nltools" "Audio Engine for Nonlinear Labs synthesizers")
 \end{verbatim}
 This will generate a debian package \{PROJECT\_NAME\}.deb that can be used by the tools and scripts to finally build the update.
 
+\subsubsection{crossBuild} \label{crossbuild}
+The function crossBuild() adds a new target producing a tar with one all the enumerated packages built for the given machine:\\
+\\
+\Prog{crossBuild}(\\
+\indent\Arg{NAME xyz}\\
+\indent\Arg{MACHINE abc}\\
+\indent\oArg{DEPENDS foo \Dots})\\
+\\
+for example in /updates/c15/epc:
+\begin{verbatim}
+crossBuild(
+    NAME update-c15-epc-bins 
+    MACHINE epc
+    DEPENDS nltools audio-engine[nltools])
+\end{verbatim}
+This will pick the \hyperref[buildenv]{build environment} for the epc, build the packages for nltools and audio-engine (while providing the nltools library in the statging dir for building the audio-engine) and bundle both resulting packages in a tar named update-c15-epc-bins.tar.
+
+\subsubsection{buildImage}
+To merge a \hyperref[os-update]{update rootfs} with the \hyperref[crossbuild]{cross-built} \hyperref[packages]{packages}, the buildImage function can be used:\\
+\\
+\Prog{buildImage}(\\
+\indent\Arg{NAME xyz}\\
+\indent\Arg{BASE abc}\\
+\indent\Arg{ADD bar \Dots}\\
+\indent\oArg{DEPENDS foo \Dots}\\
+\indent\oArg{POST\_PROCESS\_POD pod}\\
+\indent\oArg{POST\_PROCESS\_SCRIPT script.sh})\\
+\\
+for example in /updates/c15/beaglebone:
+
+\begin{verbatim}
+buildImage(
+    NAME update-c15-beaglebone
+    DEPENDS ${POD_TARGET}    DEPENDS update-c15-beaglebone-bins
+    DEPENDS os-beaglebone-update-rootfs
+    DEPENDS ${CMAKE_BINARY_DIR}/.../os-beaglebone-update-rootfs.tar
+    DEPENDS update-c15-beaglebone-bins.tar
+    BASE os/.../os-beaglebone-update-rootfs.tar
+    ADD updates/c15/beaglebone/update-c15-beaglebone-bins.tar
+    POST_PROCESS_POD ${POD_URI}
+    POST_PROCESS_SCRIPT bundle.sh)
+\end{verbatim}
+This will depend on the targets update-c15-beaglebone-bins and os-beaglebone-update-rootfs and the files os-beaglebone-update-rootfs.tar and update-c15-beaglebone-bins.tar. If all dependencies are fulfilled, it will run the bundle.sh script in the pod represented by the Dockerfile in the current directory. The bundle.sh should unpack the given tars and install all the packages inside into the rootfs specified by 'base'. The resulting rootfs will be update-c15-beaglebone.tar.
 
 \end{Name}
 \end{document}
