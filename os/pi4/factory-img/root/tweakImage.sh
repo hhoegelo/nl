@@ -12,7 +12,7 @@ chroot $OUT apt-get remove --yes ffmpeg libcamera-apps libcamera-tools libcamera
 chroot $OUT apt-get remove --yes libreoffice* vlc python3 cups aspell openjdk* cpp-10 v4l-utils qt5* qml* pipewire libqt5* git git-man manpages
 chroot $OUT apt-get remove --yes gstreamer* sane-utils gnome* fonts-cantarell fonts-cros* fonts-dejavu* fonts-droid* fonts-font-awesome fonts-noto* libavcodec*
 chroot $OUT apt-get autoremove --yes
-chroot $OUT apt-get install --yes @PI4_PACKAGES@
+chroot $OUT apt-get install --yes @PI4_package@
 
 umount $OUT/sys
 umount $OUT/dev/pts

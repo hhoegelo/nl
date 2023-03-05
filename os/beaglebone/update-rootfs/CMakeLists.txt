@@ -1,4 +1,4 @@
-file(READ ${CMAKE_BINARY_DIR}/build-environments/beaglebone/buildroot/pod-checksum BEAGLEBONE_POD_CHECKSUM)
+file(READ ${CMAKE_BINARY_DIR}/build-environment/beaglebone/buildroot/pod-checksum BEAGLEBONE_POD_CHECKSUM)
 
 registerPod(DEPENDS_ON_POD ${BEAGLEBONE_POD_CHECKSUM})
 

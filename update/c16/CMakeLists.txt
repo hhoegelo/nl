@@ -14,7 +14,7 @@ buildImage(
     DEPENDS update-c16-web
     DEPENDS update-c16-pi4
     BASE os/pi4/update-img/pi4-update.img
-    ADD updates/c16/pi4/update-c16-pi4.tar.gz
-    ADD updates/c16/web/update-c16-web.tar.gz
+    ADD update/c16/pi4/update-c16-pi4.tar.gz
+    ADD update/c16/web/update-c16-web.tar.gz
     POST_PROCESS_POD ${POD_URI}
     POST_PROCESS_SCRIPT bundle.sh)

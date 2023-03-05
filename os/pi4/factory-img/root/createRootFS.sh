@@ -137,7 +137,7 @@ tweak_root_partition() {
 
   echo "cpufreq-set -g performance" >> $OUT/etc/rc.local
  
-  rm -rf $OUT/packages
+  rm -rf $OUT/package
   
   chroot $OUT bash -c "useradd -m sscl"
   chroot $OUT bash -c "echo 'sscl:sscl' | chpasswd"

@@ -145,7 +145,7 @@ copymirrorlist=1
 
 usage() {
   cat <<EOF
-usage: ${0##*/} [options] root [packages...]
+usage: ${0##*/} [options] root [package...]
 
   Options:
     -C config      Use an alternate config file for pacman
@@ -157,7 +157,7 @@ usage: ${0##*/} [options] root [packages...]
 
     -h             Print this help message
 
-pacstrap installs packages to the specified new root directory. If no packages
+pacstrap installs package to the specified new root directory. If no package
 are given, pacstrap defaults to the "base" group.
 
 EOF
@@ -231,9 +231,9 @@ trap 'api_fs_umount "$newroot" 2>/dev/null' EXIT
 # mount API filesystems
 api_fs_mount "$newroot" || die "failed to setup API filesystems in new root"
 
-msg 'Installing packages to %s' "$newroot"
+msg 'Installing package to %s' "$newroot"
 if ! pacman -r "$newroot" -Sy "${pacman_args[@]}"; then
-  die 'Failed to install packages to new root'
+  die 'Failed to install package to new root'
 fi
 
 if (( copykeyring )); then

@@ -27,6 +27,6 @@ mount ${SSD}1 /mnt/boot
 
 echo "[epc-base]" > /etc/pacman.conf
 echo "SigLevel = Never" >> /etc/pacman.conf
-echo "Server = file:///packages" >> /etc/pacman.conf
+echo "Server = file:///package" >> /etc/pacman.conf
 pacman -Sy
 pacstrap /mnt $(pacman -Slq) | tee /log.txt

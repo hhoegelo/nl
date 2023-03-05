@@ -26,7 +26,7 @@ do_unmount() {
 
 create_rootfs() { # Create clean folder and install c15 package and all its dependencies
   do_mount
-  yes | /out/pacstrap $DIR @PACKAGES@
+  yes | /out/pacstrap $DIR @package@
 }
 
 tweak_rootfs() { # Tweak the resulting rootfs

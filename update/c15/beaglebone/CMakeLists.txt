@@ -13,7 +13,7 @@ buildImage(
     DEPENDS ${CMAKE_BINARY_DIR}/os/beaglebone/update-rootfs/os-beaglebone-update-rootfs.tar
     DEPENDS update-c15-beaglebone-bins.tar
     BASE os/beaglebone/update-rootfs/os-beaglebone-update-rootfs.tar
-    ADD updates/c15/beaglebone/update-c15-beaglebone-bins.tar
+    ADD update/c15/beaglebone/update-c15-beaglebone-bins.tar
     POST_PROCESS_POD ${POD_URI}
     POST_PROCESS_SCRIPT bundle.sh)
 

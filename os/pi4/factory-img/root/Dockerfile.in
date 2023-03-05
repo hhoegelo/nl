@@ -1,7 +1,7 @@
 FROM docker.io/debian:bullseye-slim
 RUN apt -y update
 RUN apt -y install zip fuse2fs wget mc
-RUN mkdir -p /packages
+RUN mkdir -p /package
 
 RUN mkdir /mnt/rootfs
 

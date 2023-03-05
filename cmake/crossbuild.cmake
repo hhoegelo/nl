@@ -4,9 +4,9 @@ cmake_parse_arguments(CROSS_BUILD "" "NAME;MACHINE" "DEPENDS" ${ARGN} )
 
 MESSAGE("crossBuild: ${CROSS_BUILD_NAME}")
 
-file(READ ${CMAKE_BINARY_DIR}/build-environments/${CROSS_BUILD_MACHINE}/pod-checksum DOCKERFILE_SHA1)
+file(READ ${CMAKE_BINARY_DIR}/build-environment/${CROSS_BUILD_MACHINE}/pod-checksum DOCKERFILE_SHA1)
 
-# commands for cross building all the desired packages
+# commands for cross building all the desired package
 foreach(PACKAGE ${CROSS_BUILD_DEPENDS})
 
   message("Processing package ${PACKAGE}")
@@ -24,8 +24,8 @@ foreach(PACKAGE ${CROSS_BUILD_DEPENDS})
   set(RUN_POD podman run 
     --authfile=${CMAKE_BINARY_DIR}/podman-authentication
     --tls-verify=false --rm -ti
-    -v ${CMAKE_SOURCE_DIR}/packages/${PACKAGE}:/src 
-    -v ${CMAKE_SOURCE_DIR}/build-environments/${CROSS_BUILD_MACHINE}:/build-environment 
+    -v ${CMAKE_SOURCE_DIR}/package/${PACKAGE}:/src 
+    -v ${CMAKE_SOURCE_DIR}/build-environment/${CROSS_BUILD_MACHINE}:/build-environment 
     -v ${CMAKE_CURRENT_BINARY_DIR}/build-${PACKAGE}:/build
     -v ${CMAKE_BINARY_DIR}/configuration:/build/configuration
     -v ${CMAKE_BINARY_DIR}/shared:/build/shared
@@ -35,10 +35,10 @@ foreach(PACKAGE ${CROSS_BUILD_DEPENDS})
     -w /build
     ${PODMAN_REGISTRY}/generic:${DOCKERFILE_SHA1})
 
-  file(GLOB_RECURSE ALL_PROJECT_FILES ${CMAKE_SOURCE_DIR}/packages/${PACKAGE}/*)
+  file(GLOB_RECURSE ALL_PROJECT_FILES ${CMAKE_SOURCE_DIR}/package/${PACKAGE}/*)
   file(GLOB_RECURSE ALL_CONFIGURATION_FILES ${CMAKE_SOURCE_DIR}/configuration/*)
 
-  if(EXISTS "${CMAKE_SOURCE_DIR}/build-environments/${CROSS_BUILD_MACHINE}/toolchain.cmake")
+  if(EXISTS "${CMAKE_SOURCE_DIR}/build-environment/${CROSS_BUILD_MACHINE}/toolchain.cmake")
     SET(TOOLCHAIN -DCMAKE_TOOLCHAIN_FILE=/build-environment/toolchain.cmake)
   endif()
 

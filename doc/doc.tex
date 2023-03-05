@@ -26,7 +26,7 @@ There are some conventions that glue the different parts of the build system tog
 /update/c15 => make update-c15
 /update/c15/epc => make update-c15-epc
 \end{verbatim}
-\item Machine names have to be used consistently in /build-environments, /os and /updates folders:
+\item Machine names have to be used consistently in /build-environment, /os and /update folders:
 \begin{itemize} \label{machine}
 \item epc
 \item beaglebone
@@ -46,32 +46,32 @@ The targets in the /os folder produce images (.img or .iso) or root filesystem t
 Targets in the /os/\{machine\}/factory folders shall produce images that can be used to initially hook up a machine in the factory. For the epc, the will be an iso file that can be used to install the base os, for pi4 and beaglebone this may be an image to be written on a sd card.
 
 \subsubsection{update} \label{os-update}
-Targets in /os/\{machine\}/update folders shall produce tar files containing complete root file systems for the given machine, without any product specific software. In contrast to our \hyperref[packages]{packages}, which should not be installed at this place, all system libraries needed by those packages have to be installed here.\\
+Targets in /os/\{machine\}/update folders shall produce tar files containing complete root file systems for the given machine, without any product specific software. In contrast to our \hyperref[package]{package}, which should not be installed at this place, all system libraries needed by those package have to be installed here.\\
 \\
 \emph{This is not the best solution and may be improved later.}
 
-\subsection{packages} \label{packages}
-All our self-written software is divided into packages. The term "package" is used to underline that each of this sub-projects is required to pack itself into a \hyperref[cmake-package]{debian package}. The CMakeList files in the packages subfolders should not fiddle with podman or docker, nor should they care for installing libraries, tools or whatsoever. Packages, when building, expect to find everything they need in their environment.\\
+\subsection{package} \label{package}
+All our self-written software is divided into package. The term "package" is used to underline that each of this sub-projects is required to pack itself into a \hyperref[cmake-package]{debian package}. The CMakeList files in the package subfolders should not fiddle with podman or docker, nor should they care for installing libraries, tools or whatsoever. package, when building, expect to find everything they need in their environment.\\
 \\
-\emph{Maybe we should modify packages CMakeLists, so they check for all tools needed and disable un-buildable targets if tools are missing?}
+\emph{Maybe we should modify package CMakeLists, so they check for all tools needed and disable un-buildable targets if tools are missing?}
 
-\subsection{build-environments} \label{buildenv}
-Build-environments, located in /build-environments/\{machine\}, have to bundle all tools and libraries needed to build \hyperref[packages]{packages} for a given \hyperref[machine]{machine}. They have to play together nicely with \hyperref[os-update]{update os tars} in a sense, that build-environments have to provide tools and development versions of libraries that are expected to exist in the update root filesystem by the runtime linker.\\
+\subsection{build-environment} \label{buildenv}
+build-environment, located in /build-environment/\{machine\}, have to bundle all tools and libraries needed to build \hyperref[package]{package} for a given \hyperref[machine]{machine}. They have to play together nicely with \hyperref[os-update]{update os tars} in a sense, that build-environment have to provide tools and development versions of libraries that are expected to exist in the update root filesystem by the runtime linker.\\
 A build-environment has to provide a toolchain.cmake file setting up all cmake variables needed for a proper cross build.
 
-\subsection{updates}
-In the updates folder, all previously explained concepts coalesce in targets producing update files to be put on USB sticks, spread over-the-air or uploaded onto the target devices.\\
-Here, root file systems produced by targets in \hyperref[os-update]{/os/\{machine\}/update} are extended with \hyperref[packages]{packages}, cross-built in \hyperref[buildenv]{/build-environments/\{machine\}/} and bundled by update-specific shell scripts.
+\subsection{update}
+In the update folder, all previously explained concepts coalesce in targets producing update files to be put on USB sticks, spread over-the-air or uploaded onto the target devices.\\
+Here, root file systems produced by targets in \hyperref[os-update]{/os/\{machine\}/update} are extended with \hyperref[package]{package}, cross-built in \hyperref[buildenv]{/build-environment/\{machine\}/} and bundled by update-specific shell scripts.
 
 \section{Podman} \label{pod}
 The build system heavily relies on podman. It is used to solve various problems, previously sorted out by handwritten solutions:
 \begin{itemize}
 \item Provide environment with tools and libraries
 \item Provide environment to emulate foreign architecture
-\item Store packages and tools needed to build our targets
+\item Store package and tools needed to build our targets
 \item Cache stuff on the developer computer
 \item Provide independence from 3rd-party servers by running our own docker registry
-\item Support versioned collections of packages and tools
+\item Support versioned collections of package and tools
 \item Speed up build
 \end{itemize}
 
@@ -103,10 +103,10 @@ This means, that you can unscrupulously switch between branches, relying on prop
 \section{Configuration}
 
 \subsection{Why?} \label{whygenerated}
-The whole project is configurable by yaml files, describing global properties like number of voices, available parameters, parameter ranges and so on. This properties have to be used in multiple \hyperref[packages]{packages} and it is very crucial that they are in sync. Also, package authors are free to decide which tools or languages they use, so this global properties have to be available for C/C++, java, javascript, typescript,...
+The whole project is configurable by yaml files, describing global properties like number of voices, available parameters, parameter ranges and so on. This properties have to be used in multiple \hyperref[package]{package} and it is very crucial that they are in sync. Also, package authors are free to decide which tools or languages they use, so this global properties have to be available for C/C++, java, javascript, typescript,...
 
 \subsection{How?}
-We use TypeScript for transpiling the yaml files into target language code files. The TypeScript environment is somewhat special and needs careful setup. Thatswhy I moved it into a \hyperref[pod]{pod} and integrated it into the build system in a way, that the actual transpilation process is done only once for the whole project. The result is than injected into the build-environments, so that the environments do not have to care for all the TypeScript foo.
+We use TypeScript for transpiling the yaml files into target language code files. The TypeScript environment is somewhat special and needs careful setup. Thatswhy I moved it into a \hyperref[pod]{pod} and integrated it into the build system in a way, that the actual transpilation process is done only once for the whole project. The result is than injected into the build-environment, so that the environments do not have to care for all the TypeScript foo.
 
 \section{CMake}
 The project uses CMake as build system generator. You can use it with make or ninja, both should work.
@@ -132,7 +132,7 @@ registerPod(
 	CONFIGURED_DEPENDENCIES_COPYONLY sda.sfdisk 
 	CONFIGURED_DEPENDENCIES_COPYONLY install-factory-os.sh
 	CONFIGURED_DEPENDENCIES generatePkgBuild.sh install.sh
-	USED_VARIABLES ${PACKAGES})
+	USED_VARIABLES ${package})
 \end{verbatim}
 This will configure the files sda.sfdisk, install-factory-os.sh, generatePkgBuild.sh and install.sh, the latter two with replacing of cmake variables. It will calculate a hash of
 \begin{itemize}
@@ -146,7 +146,7 @@ and use the resulting hash as version number of the pod. The resulting pod will 
 The /cmake/configuration.cmake file should be included by every package that needs access to \hyperref[whygenerated]{the generated files}. When building natively, it will just include the generated files. On cross-build, it will add the injected generated files from the outer project to the include paths.
 
 \subsubsection{package} \label{cmake-package}
-Each \hyperref[packages]{package} has to include the /cmake/package.cmake file and end with a line calling the "deb" function:\\
+Each \hyperref[package]{package} has to include the /cmake/package.cmake file and end with a line calling the "deb" function:\\
 \\
 \Prog{deb}("\Arg{dependency-target, \Dots}", "\Arg{description}")\\
 \\
@@ -157,24 +157,24 @@ deb("nltools" "Audio Engine for Nonlinear Labs synthesizers")
 This will generate a debian package \{PROJECT\_NAME\}.deb that can be used by the tools and scripts to finally build the update.
 
 \subsubsection{crossBuild} \label{crossbuild}
-The function crossBuild() adds a new target producing a tar with one all the enumerated packages built for the given machine:\\
+The function crossBuild() adds a new target producing a tar with one all the enumerated package built for the given machine:\\
 \\
 \Prog{crossBuild}(\\
 \indent\Arg{NAME xyz}\\
 \indent\Arg{MACHINE abc}\\
 \indent\oArg{DEPENDS foo \Dots})\\
 \\
-for example in /updates/c15/epc:
+for example in /update/c15/epc:
 \begin{verbatim}
 crossBuild(
     NAME update-c15-epc-bins 
     MACHINE epc
     DEPENDS nltools audio-engine[nltools])
 \end{verbatim}
-This will pick the \hyperref[buildenv]{build environment} for the epc, build the packages for nltools and audio-engine (while providing the nltools library in the statging dir for building the audio-engine) and bundle both resulting packages in a tar named update-c15-epc-bins.tar.
+This will pick the \hyperref[buildenv]{build environment} for the epc, build the package for nltools and audio-engine (while providing the nltools library in the statging dir for building the audio-engine) and bundle both resulting package in a tar named update-c15-epc-bins.tar.
 
 \subsubsection{buildImage}
-To merge a \hyperref[os-update]{update rootfs} with the \hyperref[crossbuild]{cross-built} \hyperref[packages]{packages}, the buildImage function can be used:\\
+To merge a \hyperref[os-update]{update rootfs} with the \hyperref[crossbuild]{cross-built} \hyperref[package]{package}, the buildImage function can be used:\\
 \\
 \Prog{buildImage}(\\
 \indent\Arg{NAME xyz}\\
@@ -184,7 +184,7 @@ To merge a \hyperref[os-update]{update rootfs} with the \hyperref[crossbuild]{cr
 \indent\oArg{POST\_PROCESS\_POD pod}\\
 \indent\oArg{POST\_PROCESS\_SCRIPT script.sh})\\
 \\
-for example in /updates/c15/beaglebone:
+for example in /update/c15/beaglebone:
 
 \begin{verbatim}
 buildImage(
@@ -194,11 +194,11 @@ buildImage(
     DEPENDS ${CMAKE_BINARY_DIR}/.../os-beaglebone-update-rootfs.tar
     DEPENDS update-c15-beaglebone-bins.tar
     BASE os/.../os-beaglebone-update-rootfs.tar
-    ADD updates/c15/beaglebone/update-c15-beaglebone-bins.tar
+    ADD update/c15/beaglebone/update-c15-beaglebone-bins.tar
     POST_PROCESS_POD ${POD_URI}
     POST_PROCESS_SCRIPT bundle.sh)
 \end{verbatim}
-This will depend on the targets update-c15-beaglebone-bins and os-beaglebone-update-rootfs and the files os-beaglebone-update-rootfs.tar and update-c15-beaglebone-bins.tar. If all dependencies are fulfilled, it will run the bundle.sh script in the pod represented by the Dockerfile in the current directory. The bundle.sh should unpack the given tars and install all the packages inside into the rootfs specified by 'base'. The resulting rootfs will be update-c15-beaglebone.tar.
+This will depend on the targets update-c15-beaglebone-bins and os-beaglebone-update-rootfs and the files os-beaglebone-update-rootfs.tar and update-c15-beaglebone-bins.tar. If all dependencies are fulfilled, it will run the bundle.sh script in the pod represented by the Dockerfile in the current directory. The bundle.sh should unpack the given tars and install all the package inside into the rootfs specified by 'base'. The resulting rootfs will be update-c15-beaglebone.tar.
 
 \end{Name}
 \end{document}

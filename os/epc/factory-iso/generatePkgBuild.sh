@@ -20,7 +20,7 @@ sha256sums=(
     '$(sha256sum /hook/nlhook | cut -d " " -f 1 )'
     '$(sha256sum /hook/oroot | cut -d " " -f 1 )')
 depends=(
-    $(cat /packages | sed "s/\(.*\)/'\1'/g")
+    $(cat /package | sed "s/\(.*\)/'\1'/g")
     )
 
 package() {

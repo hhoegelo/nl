@@ -6,7 +6,7 @@ This repo exists to try out different ways of integrating the NL software projec
 The build system should solve:
 - cross builds for epc, beaglebone, raspi, playcontroller and supervisor
 - caching of online resources for faster builds
-- building iso images, updates and binaries for development pc
+- building iso images, update and binaries for development pc
 - integration of build-system-time configuration
 
 

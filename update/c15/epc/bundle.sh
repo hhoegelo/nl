@@ -5,7 +5,7 @@ set -e
 
 OUT_DIR="$1"
 INPUT_ROOTFS="$2"
-PACKAGES="$3"
+package="$3"
 
 DIR=/mnt
 ROOTFS=/rootfs
@@ -29,10 +29,10 @@ do_unmount() {
   umount $DIR
 }
 
-convert_packages() {
+convert_package() {
   PACKAGE_NAMES=""
 
-  for PKG in $PACKAGES; do
+  for PKG in $package; do
       tar -xf $PKG
       
       for f in *.deb; do
@@ -52,7 +52,7 @@ build_package_database() {
   echo "SigLevel = Optional TrustAll" >> /mnt/etc/pacman.conf
 }
 
-install_packages() {
+install_package() {
   $CHROOT /mnt pacman --noconfirm -Sy 
   $CHROOT /mnt pacman --noconfirm -S $PACKAGE_NAMES
 }
@@ -78,9 +78,9 @@ main() {
   tar -xf $INPUT_ROOTFS -C $ROOTFS
 
   do_mount
-  convert_packages
+  convert_package
   build_package_database
-  install_packages
+  install_package
   do_unmount
 
   clean_rootfs

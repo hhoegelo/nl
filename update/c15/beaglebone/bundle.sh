@@ -5,7 +5,7 @@ set -e
 
 OUT_DIR="$1"
 INPUT_ROOTFS="$2"
-PACKAGES="$3"
+package="$3"
 
 DIR=/mnt
 
@@ -33,13 +33,15 @@ main() {
   tar -xf $INPUT_ROOTFS -C /rootfs --exclude=./dev/console
   do_mount
 
-  for PKG in $PACKAGES; do
+  for PKG in $package; do
       tar -xf $PKG
       
       for f in *.deb; do
         dpkg --force-all --instdir=/rootfs/ -i $f
       done     
   done
+
+  chroot /rootfs depmod -a 4.4.50
 
   do_unmount
 

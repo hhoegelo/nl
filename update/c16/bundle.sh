@@ -5,7 +5,7 @@ set -e
 
 OUT_DIR="$1"
 INPUT_ROOTFS="$2"
-PACKAGES="$3"
+package="$3"
 
 cp $INPUT_ROOTFS $OUT_DIR/update-c16.img
 dd if=$OUT_DIR/update-c16.img of=$OUT_DIR/update-c16.img.rootfs skip=@PI4_FACTORY_BASE_IMAGE_ROOT_FS_POSITION@ count=@PI4_FACTORY_BASE_IMAGE_ROOT_FS_SIZE@
@@ -19,7 +19,7 @@ mount -o bind /proc $OUT/proc
 mount -o bind /dev/pts $OUT/dev/pts
 mount -o bind /sys $OUT/sys
 
-for PKG in $PACKAGES; do
+for PKG in $package; do
     tar -xf $PKG
     cp ./*.deb /$OUT
 done

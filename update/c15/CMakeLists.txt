@@ -22,9 +22,9 @@ add_custom_command(
     DEPENDS update-c15-beaglebone 
     DEPENDS update-c15-epc 
     DEPENDS update-c15-playcontroller
-    DEPENDS ${CMAKE_BINARY_DIR}/updates/c15/beaglebone/update-c15-beaglebone.tar
-    DEPENDS ${CMAKE_BINARY_DIR}/updates/c15/epc/update-c15-epc.tar
-    DEPENDS ${CMAKE_BINARY_DIR}/updates/c15/playcontroller/update-c15-playcontroller.tar
+    DEPENDS ${CMAKE_BINARY_DIR}/update/c15/beaglebone/update-c15-beaglebone.tar
+    DEPENDS ${CMAKE_BINARY_DIR}/update/c15/epc/update-c15-epc.tar
+    DEPENDS ${CMAKE_BINARY_DIR}/update/c15/playcontroller/update-c15-playcontroller.tar
     DEPENDS ${CMAKE_BINARY_DIR}/os/beaglebone/factory-rootfs/os-beaglebone-factory-MLO
     DEPENDS ${CMAKE_BINARY_DIR}/os/beaglebone/factory-rootfs/os-beaglebone-factory-u-boot.img
     VERBATIM

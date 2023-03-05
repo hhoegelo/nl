@@ -11,18 +11,18 @@ RUN pacman-key --init && \
     echo "Server=https://archive.archlinux.org/repos/@ARCH_VERSION_YEAR@/@ARCH_VERSION_MONTH@/@ARCH_VERSION_DAY@/\$repo/os/\$arch" > /etc/pacman.d/mirrorlist && \
     pacman --noconfirm -Syu && \
     pacman --noconfirm -S rsync arch-install-scripts fuse2fs e2fsprogs wget nano vi && \
-    mkdir -p /packages && \
+    mkdir -p /package && \
     mkdir -p /tmp/blankdb
 
-WORKDIR /packages
-RUN pacman --noconfirm -Syw --cachedir . --dbpath /tmp/blankdb @PACKAGES@ && \
-    rm /packages/wpa_supplicant* && \
+WORKDIR /package
+RUN pacman --noconfirm -Syw --cachedir . --dbpath /tmp/blankdb @package@ && \
+    rm /package/wpa_supplicant* && \
     wget https://archive.archlinux.org/packages/w/wpa_supplicant/wpa_supplicant-2%3A2.9-8-x86_64.pkg.tar.zst && \
     wget https://archive.archlinux.org/packages/w/wpa_supplicant/wpa_supplicant-2%3A2.9-8-x86_64.pkg.tar.zst.sig && \
-    pacman --noconfirm -Uw --cachedir . --dbpath /tmp/blankdb /packages/wpa_supplicant-2:2.9-8-x86_64.pkg.tar.zst && \
+    pacman --noconfirm -Uw --cachedir . --dbpath /tmp/blankdb /package/wpa_supplicant-2:2.9-8-x86_64.pkg.tar.zst && \
     mkdir -p /nl && \
-    repo-add -q /nl/nl.db.tar.gz /packages/*.pkg.tar.zst /packages/*.pkg.tar.xz && \
-    rsync -av --progress /packages/* /nl/ --exclude node_modules && \
+    repo-add -q /nl/nl.db.tar.gz /package/*.pkg.tar.zst /package/*.pkg.tar.xz && \
+    rsync -av --progress /package/* /nl/ --exclude node_modules && \
     echo "[nl]" > /etc/pacman.conf && \
     echo "Server = file:///nl/" >> /etc/pacman.conf && \
     echo "SigLevel = Optional TrustAll" >> /etc/pacman.conf

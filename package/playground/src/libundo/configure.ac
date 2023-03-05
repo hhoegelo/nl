@@ -12,7 +12,7 @@ m4_define([undo_version],
 # This is the X.Y used in -lundo-X.Y
 m4_define([undo_api_version], [1.0])
 
-# required versions of other packages
+# required versions of other package
 m4_define([glib_required_version], [2.32.0])
 
 AC_INIT([undo], [undo_version])
